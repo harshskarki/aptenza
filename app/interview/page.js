@@ -1,18 +1,20 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect, useRef, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 
-export default function InterviewPage() {
+function InterviewContent() {
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [sessionStarted, setSessionStarted] = useState(false)
   const [interviewType, setInterviewType] = useState('dsa')
   const [user, setUser] = useState(null)
+  const [profile, setProfile] = useState(null)
   const bottomRef = useRef(null)
   const router = useRouter()
+  const searchParams = useSearchParams()
 
   useEffect(() => {
     async function checkUser() {
@@ -23,6 +25,16 @@ export default function InterviewPage() {
         return
       }
       setUser(user)
+
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single()
+      setProfile(profileData)
+
+      const type = searchParams.get('type')
+      if (type) setInterviewType(type)
     }
     checkUser()
   }, [])
@@ -35,14 +47,12 @@ export default function InterviewPage() {
     setSessionStarted(true)
     setLoading(true)
 
-    const systemPrompt = getSystemPrompt(interviewType)
-
     const response = await fetch('/api/interview', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         messages: [],
-        systemPrompt,
+        interviewType,
         isStart: true
       })
     })
@@ -50,6 +60,30 @@ export default function InterviewPage() {
     const data = await response.json()
     setMessages([{ role: 'assistant', content: data.message }])
     setLoading(false)
+  }
+
+  async function saveSession(messages, lastResponse) {
+    const supabase = createClient()
+
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+
+    const scoreMatch = lastResponse.match(/(\d+)\/10/)
+    const score = scoreMatch ? parseInt(scoreMatch[1]) : null
+
+    await supabase.from('sessions').insert({
+      user_id: user.id,
+      type: interviewType,
+      status: 'completed',
+      score: score,
+      feedback: lastResponse,
+      transcript: messages
+    })
+
+    await supabase
+      .from('profiles')
+      .update({ interviews_used: (profile?.interviews_used || 0) + 1 })
+      .eq('id', user.id)
   }
 
   async function sendMessage() {
@@ -66,34 +100,27 @@ export default function InterviewPage() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         messages: updatedMessages,
-        systemPrompt: getSystemPrompt(interviewType),
+        interviewType,
         isStart: false
       })
     })
 
     const data = await response.json()
-    setMessages(prev => [...prev, { role: 'assistant', content: data.message }])
+    const assistantMessage = { role: 'assistant', content: data.message }
+    setMessages(prev => [...prev, assistantMessage])
     setLoading(false)
+
+    // Save session when interview ends (after 6 messages = 3 exchanges)
+    if (updatedMessages.length >= 6) {
+      await saveSession(updatedMessages, data.message)
+    }
   }
 
-  function getSystemPrompt(type) {
-    const prompts = {
-      dsa: `You are a senior software engineer conducting a DSA mock interview. 
-        Ask one DSA question at a time. Start with an easy/medium problem. 
-        When the candidate answers, give constructive feedback, then ask a follow up 
-        or move to the next question. Be encouraging but honest. 
-        After 3 questions, give an overall score out of 10 and detailed feedback.`,
-      behavioral: `You are an experienced HR interviewer conducting a behavioral interview.
-        Ask situational questions using the STAR method framework.
-        Be professional and encouraging. After 3 questions give overall feedback.`,
-      system_design: `You are a staff engineer conducting a system design interview.
-        Ask the candidate to design a real world system. Guide them through 
-        requirements, high level design, and deep dives. Give feedback after each response.`,
-      domain: `You are a domain expert conducting a technical interview.
-        Ask specific technical questions relevant to the candidate's domain.
-        Give detailed feedback on each answer.`
-    }
-    return prompts[type]
+  const typeLabels = {
+    dsa: '💻 DSA Interview',
+    behavioral: '🧠 Behavioral Interview',
+    system_design: '⚙️ System Design',
+    domain: '🎯 Domain Specific'
   }
 
   if (!sessionStarted) {
@@ -138,10 +165,9 @@ export default function InterviewPage() {
   return (
     <main className="min-h-screen bg-gray-950 flex flex-col">
 
-      {/* Header */}
       <nav className="border-b border-gray-800 px-6 py-4 flex items-center justify-between">
         <h1 className="text-xl font-bold text-white">Aptenza</h1>
-        <span className="text-gray-400 text-sm capitalize">{interviewType.replace('_', ' ')} Interview</span>
+        <span className="text-gray-400 text-sm">{typeLabels[interviewType]}</span>
         <button
           onClick={() => router.push('/dashboard')}
           className="text-sm text-gray-400 hover:text-white transition"
@@ -150,7 +176,6 @@ export default function InterviewPage() {
         </button>
       </nav>
 
-      {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-6 max-w-3xl mx-auto w-full">
         {messages.map((msg, i) => (
           <div
@@ -158,7 +183,7 @@ export default function InterviewPage() {
             className={`mb-4 flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+              className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap ${
                 msg.role === 'user'
                   ? 'bg-indigo-600 text-white'
                   : 'bg-gray-900 text-gray-100 border border-gray-800'
@@ -180,7 +205,6 @@ export default function InterviewPage() {
         <div ref={bottomRef} />
       </div>
 
-      {/* Input */}
       <div className="border-t border-gray-800 px-4 py-4">
         <div className="max-w-3xl mx-auto flex gap-3">
           <input
@@ -202,5 +226,17 @@ export default function InterviewPage() {
       </div>
 
     </main>
+  )
+}
+
+export default function InterviewPage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen bg-gray-950 flex items-center justify-center">
+        <p className="text-gray-400">Loading...</p>
+      </main>
+    }>
+      <InterviewContent />
+    </Suspense>
   )
 }

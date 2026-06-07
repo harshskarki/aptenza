@@ -51,20 +51,26 @@ export default function DashboardPage() {
     <main className="min-h-screen bg-gray-950 text-white">
 
       {/* Navbar */}
-      <nav className="border-b border-gray-800 px-6 py-4 flex items-center justify-between">
-        <h1 className="text-xl font-bold text-white">Aptenza</h1>
-        <div className="flex items-center gap-4">
-          <span className="text-gray-400 text-sm">
-            {profile?.full_name || profile?.email}
-          </span>
-          <button
-            onClick={handleLogout}
-            className="text-sm text-gray-400 hover:text-white transition"
-          >
-            Logout
-          </button>
-        </div>
-      </nav>
+<nav className="border-b border-gray-800 px-6 py-4 flex items-center justify-between">
+  <h1 className="text-xl font-bold text-white">Aptenza</h1>
+  <div className="flex items-center gap-6">
+    <button
+      onClick={() => router.push('/analytics')}
+      className="text-sm text-gray-400 hover:text-white transition"
+    >
+      Analytics
+    </button>
+    <span className="text-gray-400 text-sm">
+      {profile?.full_name || profile?.email}
+    </span>
+    <button
+      onClick={handleLogout}
+      className="text-sm text-gray-400 hover:text-white transition"
+    >
+      Logout
+    </button>
+  </div>
+</nav>
 
       {/* Main content */}
       <div className="max-w-5xl mx-auto px-6 py-10">
@@ -99,28 +105,40 @@ export default function DashboardPage() {
         <h3 className="text-lg font-semibold mb-4">Start a mock interview</h3>
         <div className="grid grid-cols-2 gap-4">
 
-          <div className="bg-gray-900 rounded-xl p-6 border border-gray-800 hover:border-indigo-500 transition cursor-pointer">
+          <div
+            onClick={() => router.push('/interview?type=dsa')}
+            className="bg-gray-900 rounded-xl p-6 border border-gray-800 hover:border-indigo-500 transition cursor-pointer"
+          >
             <div className="text-2xl mb-3">💻</div>
             <h4 className="font-semibold text-white">DSA Interview</h4>
             <p className="text-gray-400 text-sm mt-1">Data structures, algorithms, problem solving</p>
             <span className="inline-block mt-3 text-xs bg-indigo-900 text-indigo-300 px-2 py-1 rounded-full">Free</span>
           </div>
 
-          <div className="bg-gray-900 rounded-xl p-6 border border-gray-800 hover:border-indigo-500 transition cursor-pointer">
+          <div
+            onClick={() => router.push('/interview?type=behavioral')}
+            className="bg-gray-900 rounded-xl p-6 border border-gray-800 hover:border-indigo-500 transition cursor-pointer"
+          >
             <div className="text-2xl mb-3">🧠</div>
             <h4 className="font-semibold text-white">Behavioral Interview</h4>
             <p className="text-gray-400 text-sm mt-1">HR questions, situational, STAR method</p>
             <span className="inline-block mt-3 text-xs bg-gray-800 text-gray-400 px-2 py-1 rounded-full">Pro</span>
           </div>
 
-          <div className="bg-gray-900 rounded-xl p-6 border border-gray-800 hover:border-indigo-500 transition cursor-pointer">
+          <div
+            onClick={() => router.push('/interview?type=system_design')}
+            className="bg-gray-900 rounded-xl p-6 border border-gray-800 hover:border-indigo-500 transition cursor-pointer"
+          >
             <div className="text-2xl mb-3">⚙️</div>
             <h4 className="font-semibold text-white">System Design</h4>
             <p className="text-gray-400 text-sm mt-1">Architecture, scalability, design patterns</p>
             <span className="inline-block mt-3 text-xs bg-gray-800 text-gray-400 px-2 py-1 rounded-full">Pro</span>
           </div>
 
-          <div className="bg-gray-900 rounded-xl p-6 border border-gray-800 hover:border-indigo-500 transition cursor-pointer">
+          <div
+            onClick={() => router.push('/interview?type=domain')}
+            className="bg-gray-900 rounded-xl p-6 border border-gray-800 hover:border-indigo-500 transition cursor-pointer"
+          >
             <div className="text-2xl mb-3">🎯</div>
             <h4 className="font-semibold text-white">Domain Specific</h4>
             <p className="text-gray-400 text-sm mt-1">ML, Finance, Frontend, Backend and more</p>
