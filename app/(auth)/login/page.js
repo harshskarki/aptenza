@@ -4,6 +4,17 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import Link from 'next/link'
+import { motion } from 'framer-motion'
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } }
+}
+
+const stagger = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.1 } }
+}
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -18,10 +29,7 @@ export default function LoginPage() {
     setError('')
 
     const supabase = createClient()
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
 
     if (error) {
       setError(error.message)
@@ -32,64 +40,94 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-950 flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
+    <main className="min-h-screen bg-gray-950 flex items-center justify-center px-4 relative overflow-hidden">
 
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white">Aptenza</h1>
-          <p className="text-gray-400 mt-2">Welcome back. Let's get you prepared.</p>
-        </div>
+      {/* Background glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="bg-gray-900 rounded-2xl p-8 border border-gray-800">
-          <h2 className="text-xl font-semibold text-white mb-6">Sign in</h2>
+      <motion.div
+        variants={stagger}
+        initial="hidden"
+        animate="visible"
+        className="w-full max-w-md relative z-10"
+      >
 
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <label className="text-sm text-gray-400 mb-1 block">Email</label>
+        {/* Logo */}
+        <motion.div variants={fadeUp} className="text-center mb-8">
+          <div
+            onClick={() => router.push('/')}
+            className="inline-flex items-center gap-2 cursor-pointer mb-4"
+          >
+            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-sm font-black">A</div>
+            <span className="text-xl font-bold tracking-tight">Aptenza</span>
+          </div>
+          <h1 className="text-3xl font-black">Welcome back</h1>
+          <p className="text-gray-400 mt-2">Sign in to continue your prep journey.</p>
+        </motion.div>
+
+        {/* Card */}
+        <motion.div
+          variants={fadeUp}
+          className="bg-gray-900 rounded-2xl p-8 border border-white/5 shadow-2xl"
+        >
+          <form onSubmit={handleLogin} className="space-y-5">
+
+            <motion.div variants={fadeUp}>
+              <label className="text-sm text-gray-400 mb-1.5 block font-medium">Email</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full bg-gray-800 text-white rounded-lg px-4 py-3 border border-gray-700 focus:outline-none focus:border-indigo-500 transition"
+                className="w-full bg-gray-800 text-white rounded-xl px-4 py-3 border border-white/5 focus:outline-none focus:border-indigo-500 transition placeholder-gray-600"
                 placeholder="you@example.com"
               />
-            </div>
+            </motion.div>
 
-            <div>
-              <label className="text-sm text-gray-400 mb-1 block">Password</label>
+            <motion.div variants={fadeUp}>
+              <label className="text-sm text-gray-400 mb-1.5 block font-medium">Password</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full bg-gray-800 text-white rounded-lg px-4 py-3 border border-gray-700 focus:outline-none focus:border-indigo-500 transition"
+                className="w-full bg-gray-800 text-white rounded-xl px-4 py-3 border border-white/5 focus:outline-none focus:border-indigo-500 transition placeholder-gray-600"
                 placeholder="••••••••"
               />
-            </div>
+            </motion.div>
 
             {error && (
-              <p className="text-red-400 text-sm">{error}</p>
+              <motion.p
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="text-red-400 text-sm bg-red-400/10 border border-red-400/20 rounded-lg px-4 py-2"
+              >
+                {error}
+              </motion.p>
             )}
 
-            <button
+            <motion.button
+              variants={fadeUp}
+              whileHover={{ scale: 1.02, boxShadow: '0 0 20px rgba(99,102,241,0.3)' }}
+              whileTap={{ scale: 0.98 }}
               type="submit"
               disabled={loading}
-              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg transition disabled:opacity-50"
+              className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3.5 rounded-xl transition disabled:opacity-50 text-base"
             >
-              {loading ? 'Signing in...' : 'Sign in'}
-            </button>
+              {loading ? 'Signing in...' : 'Sign in →'}
+            </motion.button>
+
           </form>
 
-          <p className="text-gray-400 text-sm text-center mt-6">
+          <motion.p variants={fadeUp} className="text-gray-500 text-sm text-center mt-6">
             Don't have an account?{' '}
-            <Link href="/signup" className="text-indigo-400 hover:underline">
-              Sign up
+            <Link href="/signup" className="text-indigo-400 hover:text-indigo-300 font-medium transition">
+              Sign up free
             </Link>
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
 
-      </div>
+      </motion.div>
     </main>
   )
-} 
+}
