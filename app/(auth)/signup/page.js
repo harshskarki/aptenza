@@ -22,6 +22,7 @@ export default function SignupPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [googleLoading, setGoogleLoading] = useState(false)
   const router = useRouter()
 
   async function handleSignup(e) {
@@ -33,9 +34,7 @@ export default function SignupPage() {
     const { error } = await supabase.auth.signUp({
       email,
       password,
-      options: {
-        data: { full_name: fullName }
-      }
+      options: { data: { full_name: fullName } }
     })
 
     if (error) {
@@ -46,10 +45,24 @@ export default function SignupPage() {
     }
   }
 
+  async function handleGoogleLogin() {
+    setGoogleLoading(true)
+    const supabase = createClient()
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`
+      }
+    })
+    if (error) {
+      setError(error.message)
+      setGoogleLoading(false)
+    }
+  }
+
   return (
     <main className="min-h-screen bg-gray-950 flex items-center justify-center px-4 relative overflow-hidden">
 
-      {/* Background glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-3xl pointer-events-none" />
 
       <motion.div
@@ -59,7 +72,6 @@ export default function SignupPage() {
         className="w-full max-w-md relative z-10"
       >
 
-        {/* Logo */}
         <motion.div variants={fadeUp} className="text-center mb-8">
           <div
             onClick={() => router.push('/')}
@@ -72,11 +84,35 @@ export default function SignupPage() {
           <p className="text-gray-400 mt-2">Start your interview prep journey for free.</p>
         </motion.div>
 
-        {/* Card */}
         <motion.div
           variants={fadeUp}
           className="bg-gray-900 rounded-2xl p-8 border border-white/5 shadow-2xl"
         >
+
+          {/* Google button */}
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={handleGoogleLogin}
+            disabled={googleLoading}
+            className="w-full flex items-center justify-center gap-3 bg-white hover:bg-gray-100 text-gray-900 font-semibold py-3 rounded-xl transition mb-6 disabled:opacity-50"
+          >
+            <svg width="18" height="18" viewBox="0 0 18 18">
+              <path fill="#4285F4" d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 0 0 2.38-5.88c0-.57-.05-.66-.15-1.18z"/>
+              <path fill="#34A853" d="M8.98 17c2.16 0 3.97-.72 5.3-1.94l-2.6-2a4.8 4.8 0 0 1-7.18-2.54H1.83v2.07A8 8 0 0 0 8.98 17z"/>
+              <path fill="#FBBC05" d="M4.5 10.52a4.8 4.8 0 0 1 0-3.04V5.41H1.83a8 8 0 0 0 0 7.18l2.67-2.07z"/>
+              <path fill="#EA4335" d="M8.98 4.18c1.17 0 2.23.4 3.06 1.2l2.3-2.3A8 8 0 0 0 1.83 5.4L4.5 7.49a4.77 4.77 0 0 1 4.48-3.3z"/>
+            </svg>
+            {googleLoading ? 'Redirecting...' : 'Continue with Google'}
+          </motion.button>
+
+          {/* Divider */}
+          <div className="flex items-center gap-3 mb-6">
+            <div className="flex-1 h-px bg-white/5"></div>
+            <span className="text-gray-600 text-xs">or sign up with email</span>
+            <div className="flex-1 h-px bg-white/5"></div>
+          </div>
+
           <form onSubmit={handleSignup} className="space-y-5">
 
             <motion.div variants={fadeUp}>
@@ -140,7 +176,6 @@ export default function SignupPage() {
 
           </form>
 
-          {/* Divider */}
           <div className="flex items-center gap-3 my-5">
             <div className="flex-1 h-px bg-white/5"></div>
             <span className="text-gray-600 text-xs">or</span>
@@ -155,7 +190,6 @@ export default function SignupPage() {
           </p>
         </motion.div>
 
-        {/* Trust note */}
         <motion.p variants={fadeUp} className="text-center text-gray-600 text-xs mt-6">
           ✓ Free forever · ✓ No credit card · ✓ 3 interviews/month
         </motion.p>
