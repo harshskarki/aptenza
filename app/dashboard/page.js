@@ -139,7 +139,12 @@ export default function DashboardPage() {
           >
             Analytics
           </button>
-          <span className="text-gray-400 text-sm">{profile?.full_name || profile?.email}</span>
+          <span
+  onClick={() => router.push('/profile')}
+  className="text-gray-400 text-sm cursor-pointer hover:text-white transition"
+>
+  {profile?.full_name || profile?.email}
+</span>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.97 }}
