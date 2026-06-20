@@ -151,6 +151,12 @@ export default function DashboardPage() {
           >
             Leaderboard
           </button>
+          <button
+            onClick={() => router.push('/practice-queue')}
+            className="text-sm text-gray-400 hover:text-white transition"
+          >
+            Practice Queue
+          </button>
           <span
   onClick={() => router.push('/profile')}
   className="text-gray-400 text-sm cursor-pointer hover:text-white transition"

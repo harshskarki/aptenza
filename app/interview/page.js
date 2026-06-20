@@ -93,9 +93,43 @@ function InterviewContent() {
     setLoading(false)
     if (updatedMessages.length >= 6) {
       await saveSession(updatedMessages, data.message)
+      
+      // Check if there's a queue to continue
+      const fromQueue = searchParams.get('fromQueue')
+      if (fromQueue) {
+        const saved = sessionStorage.getItem('practiceQueue')
+        const remaining = saved ? JSON.parse(saved) : []
+        
+        setTimeout(() => {
+          if (remaining.length > 0) {
+            router.push('/practice-queue')
+          } else {
+            sessionStorage.removeItem('practiceQueue')
+            router.push('/dashboard')
+          }
+        }, 3000)
+      }
     }
   }
 
+  function handleEndInterview() {
+    const fromQueue = searchParams.get('fromQueue')
+    
+    if (fromQueue) {
+      const saved = sessionStorage.getItem('practiceQueue')
+      const remaining = saved ? JSON.parse(saved) : []
+      
+      if (remaining.length > 0) {
+        router.push('/practice-queue')
+      } else {
+        sessionStorage.removeItem('practiceQueue')
+        router.push('/dashboard')
+      }
+    } else {
+      router.push('/dashboard')
+    }
+  }
+  
   const typeLabels = {
     dsa: '💻 DSA Interview',
     behavioral: '🧠 Behavioral Interview',
@@ -187,7 +221,7 @@ function InterviewContent() {
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.97 }}
-          onClick={() => router.push('/dashboard')}
+          onClick={handleEndInterview}
           className="text-sm bg-gray-800 hover:bg-red-900 text-gray-300 hover:text-red-300 px-4 py-1.5 rounded-lg transition"
         >
           End interview
