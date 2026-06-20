@@ -139,6 +139,18 @@ export default function DashboardPage() {
           >
             Analytics
           </button>
+          <button
+            onClick={() => router.push('/search')}
+            className="text-sm text-gray-400 hover:text-white transition"
+          >
+            Search
+          </button>
+          <button
+            onClick={() => router.push('/leaderboard')}
+            className="text-sm text-gray-400 hover:text-white transition"
+          >
+            Leaderboard
+          </button>
           <span
   onClick={() => router.push('/profile')}
   className="text-gray-400 text-sm cursor-pointer hover:text-white transition"
