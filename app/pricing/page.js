@@ -1,7 +1,9 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import { createClient } from '@/lib/supabase'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
@@ -15,6 +17,103 @@ const stagger = {
 
 export default function PricingPage() {
   const router = useRouter()
+  const [user, setUser] = useState(null)
+  const [profile, setProfile] = useState(null)
+  const [loadingPlan, setLoadingPlan] = useState(null)
+
+  useEffect(() => {
+    async function loadUser() {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        setUser(user)
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single()
+        setProfile(profile)
+      }
+    }
+    loadUser()
+  }, [])
+
+  async function handleUpgrade(plan) {
+    // Not logged in — redirect to signup
+    if (!user) {
+      router.push('/signup')
+      return
+    }
+
+    setLoadingPlan(plan)
+
+    try {
+      // Step 1: Create order on server
+      const orderRes = await fetch('/api/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan })
+      })
+      const orderData = await orderRes.json()
+
+      if (orderData.error) {
+        alert('Something went wrong. Please try again.')
+        setLoadingPlan(null)
+        return
+      }
+
+      // Step 2: Open Razorpay checkout
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount: orderData.amount,
+        currency: 'INR',
+        name: 'Aptenza',
+        description: `${plan === 'pro' ? 'Pro' : 'Premium'} Plan Subscription`,
+        order_id: orderData.orderId,
+        prefill: {
+          name: profile?.full_name || '',
+          email: user.email
+        },
+        theme: { color: '#4f46e5' },
+        handler: async function (response) {
+          // Step 3: Verify payment on server
+          const verifyRes = await fetch('/api/verify-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              plan: plan,
+              userId: user.id
+            })
+          })
+          const verifyData = await verifyRes.json()
+
+          if (verifyData.success) {
+            router.push('/dashboard?upgraded=true')
+          } else {
+            alert('Payment verification failed. Please contact support.')
+          }
+          setLoadingPlan(null)
+        },
+        modal: {
+          ondismiss: function () {
+            setLoadingPlan(null)
+          }
+        }
+      }
+
+      const razorpayInstance = new window.Razorpay(options)
+      razorpayInstance.open()
+
+    } catch (error) {
+      alert('Something went wrong. Please try again.')
+      setLoadingPlan(null)
+    }
+  }
+
+  const isCurrentPlan = (plan) => profile?.plan === plan
 
   return (
     <main className="min-h-screen bg-gray-950 text-white">
@@ -34,14 +133,18 @@ export default function PricingPage() {
           <span className="text-lg font-bold tracking-tight">Aptenza</span>
         </div>
         <div className="flex items-center gap-6">
-          <button onClick={() => router.push('/login')} className="text-sm text-gray-400 hover:text-white transition">Sign in</button>
+          {user ? (
+            <button onClick={() => router.push('/dashboard')} className="text-sm text-gray-400 hover:text-white transition">Dashboard</button>
+          ) : (
+            <button onClick={() => router.push('/login')} className="text-sm text-gray-400 hover:text-white transition">Sign in</button>
+          )}
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.97 }}
-            onClick={() => router.push('/signup')}
+            onClick={() => router.push(user ? '/dashboard' : '/signup')}
             className="text-sm bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-lg transition font-medium"
           >
-            Get started free
+            {user ? 'Go to dashboard' : 'Get started free'}
           </motion.button>
         </div>
       </motion.nav>
@@ -107,14 +210,20 @@ export default function PricingPage() {
                 </li>
               ))}
             </ul>
-            <motion.button
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              onClick={() => router.push('/signup')}
-              className="w-full border border-gray-700 hover:border-indigo-500 text-white py-3 rounded-xl transition text-sm font-semibold"
-            >
-              Get started free
-            </motion.button>
+            {isCurrentPlan('free') ? (
+              <div className="w-full text-center border border-green-500/30 text-green-400 py-3 rounded-xl text-sm font-semibold">
+                ✓ Current plan
+              </div>
+            ) : (
+              <motion.button
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                onClick={() => router.push(user ? '/dashboard' : '/signup')}
+                className="w-full border border-gray-700 hover:border-indigo-500 text-white py-3 rounded-xl transition text-sm font-semibold"
+              >
+                Get started free
+              </motion.button>
+            )}
           </motion.div>
 
           {/* Pro */}
@@ -152,14 +261,21 @@ export default function PricingPage() {
                 </li>
               ))}
             </ul>
-            <motion.button
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              onClick={() => router.push('/signup')}
-              className="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3 rounded-xl transition text-sm font-semibold"
-            >
-              Get Pro
-            </motion.button>
+            {isCurrentPlan('pro') ? (
+              <div className="w-full text-center border border-green-500/30 text-green-400 py-3 rounded-xl text-sm font-semibold">
+                ✓ Current plan
+              </div>
+            ) : (
+              <motion.button
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                onClick={() => handleUpgrade('pro')}
+                disabled={loadingPlan === 'pro'}
+                className="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3 rounded-xl transition text-sm font-semibold disabled:opacity-50"
+              >
+                {loadingPlan === 'pro' ? 'Processing...' : 'Get Pro'}
+              </motion.button>
+            )}
           </motion.div>
 
           {/* Premium */}
@@ -194,14 +310,21 @@ export default function PricingPage() {
                 </li>
               ))}
             </ul>
-            <motion.button
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              onClick={() => router.push('/signup')}
-              className="w-full border border-gray-700 hover:border-indigo-500 text-white py-3 rounded-xl transition text-sm font-semibold"
-            >
-              Get Premium
-            </motion.button>
+            {isCurrentPlan('premium') ? (
+              <div className="w-full text-center border border-green-500/30 text-green-400 py-3 rounded-xl text-sm font-semibold">
+                ✓ Current plan
+              </div>
+            ) : (
+              <motion.button
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                onClick={() => handleUpgrade('premium')}
+                disabled={loadingPlan === 'premium'}
+                className="w-full border border-gray-700 hover:border-indigo-500 text-white py-3 rounded-xl transition text-sm font-semibold disabled:opacity-50"
+              >
+                {loadingPlan === 'premium' ? 'Processing...' : 'Get Premium'}
+              </motion.button>
+            )}
           </motion.div>
 
         </div>
@@ -214,6 +337,9 @@ export default function PricingPage() {
           <p className="text-gray-400 text-sm">
             Questions? Email us at{' '}
             <span className="text-indigo-400">support@aptenza.io</span>
+          </p>
+          <p className="text-gray-600 text-xs mt-2">
+            🔒 Payments secured by Razorpay · Test mode active
           </p>
         </motion.div>
 
