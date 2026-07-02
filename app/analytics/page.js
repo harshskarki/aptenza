@@ -238,7 +238,8 @@ export default function AnalyticsPage() {
                   key={session.id}
                   variants={fadeUp}
                   whileHover={{ scale: 1.01, borderColor: 'rgba(99,102,241,0.3)' }}
-                  className="flex items-center justify-between p-4 bg-gray-800 rounded-xl border border-transparent transition-colors"
+                  onClick={() => router.push(`/transcript/${session.id}`)}
+                  className="flex items-center justify-between p-4 bg-gray-800 rounded-xl border border-transparent transition-colors cursor-pointer"
                 >
                   <div className="flex items-center gap-4">
                     <div className="w-10 h-10 bg-indigo-900 rounded-xl flex items-center justify-center text-lg">
