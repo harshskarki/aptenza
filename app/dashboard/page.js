@@ -157,12 +157,18 @@ export default function DashboardPage() {
           >
             Practice Queue
           </button>
+          <button
+            onClick={() => router.push('/code')}
+            className="text-sm text-gray-400 hover:text-white transition"
+          >
+            Code Editor
+          </button>
           <span
-  onClick={() => router.push('/profile')}
-  className="text-gray-400 text-sm cursor-pointer hover:text-white transition"
->
-  {profile?.full_name || profile?.email}
-</span>
+            onClick={() => router.push('/profile')}
+            className="text-gray-400 text-sm cursor-pointer hover:text-white transition"
+          >
+            {profile?.full_name || profile?.email}
+          </span>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.97 }}
