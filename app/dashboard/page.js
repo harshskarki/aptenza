@@ -163,6 +163,12 @@ export default function DashboardPage() {
           >
             Code Editor
           </button>
+          <button
+            onClick={() => router.push('/whiteboard')}
+            className="text-sm text-gray-400 hover:text-white transition"
+          >
+            Whiteboard
+          </button>
           <span
             onClick={() => router.push('/profile')}
             className="text-gray-400 text-sm cursor-pointer hover:text-white transition"
