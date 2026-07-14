@@ -2,6 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
 import Script from "next/script";
+import '@excalidraw/excalidraw/index.css'
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
