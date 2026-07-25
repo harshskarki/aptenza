@@ -164,6 +164,12 @@ export default function DashboardPage() {
             Code Editor
           </button>
           <button
+            onClick={() => router.push('/star')}
+            className="text-sm text-gray-400 hover:text-white transition"
+          >
+            STAR Builder
+          </button>
+          <button
             onClick={() => router.push('/whiteboard')}
             className="text-sm text-gray-400 hover:text-white transition"
           >
