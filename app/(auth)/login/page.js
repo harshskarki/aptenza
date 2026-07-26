@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
+import ThemeToggle from '@/components/ThemeToggle'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -28,10 +29,8 @@ export default function LoginPage() {
     e.preventDefault()
     setLoading(true)
     setError('')
-
     const supabase = createClient()
     const { error } = await supabase.auth.signInWithPassword({ email, password })
-
     if (error) {
       setError(error.message)
       setLoading(false)
@@ -45,9 +44,7 @@ export default function LoginPage() {
     const supabase = createClient()
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`
-      }
+      options: { redirectTo: `${window.location.origin}/auth/callback` }
     })
     if (error) {
       setError(error.message)
@@ -56,9 +53,15 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-950 flex items-center justify-center px-4 relative overflow-hidden">
+    <main className="min-h-screen bg-white dark:bg-gray-950 flex items-center justify-center px-4 relative overflow-hidden transition-colors duration-300">
 
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-3xl pointer-events-none" />
+      {/* Background glow — dark only */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-3xl pointer-events-none hidden dark:block" />
+
+      {/* Theme toggle */}
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
 
       <motion.div
         variants={stagger}
@@ -67,21 +70,23 @@ export default function LoginPage() {
         className="w-full max-w-md relative z-10"
       >
 
+        {/* Logo */}
         <motion.div variants={fadeUp} className="text-center mb-8">
           <div
             onClick={() => router.push('/')}
             className="inline-flex items-center gap-2 cursor-pointer mb-4"
           >
-            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-sm font-black">A</div>
-            <span className="text-xl font-bold tracking-tight">Aptenza</span>
+            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-sm font-black text-white">A</div>
+            <span className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">Aptenza</span>
           </div>
-          <h1 className="text-3xl font-black">Welcome back</h1>
-          <p className="text-gray-400 mt-2">Sign in to continue your prep journey.</p>
+          <h1 className="text-3xl font-black text-gray-900 dark:text-white">Welcome back</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-2">Sign in to continue your prep journey.</p>
         </motion.div>
 
+        {/* Card */}
         <motion.div
           variants={fadeUp}
-          className="bg-gray-900 rounded-2xl p-8 border border-white/5 shadow-2xl"
+          className="bg-gray-50 dark:bg-gray-900 rounded-2xl p-8 border border-gray-200 dark:border-white/5 shadow-sm dark:shadow-2xl transition-colors duration-300"
         >
 
           {/* Google button */}
@@ -90,7 +95,7 @@ export default function LoginPage() {
             whileTap={{ scale: 0.98 }}
             onClick={handleGoogleLogin}
             disabled={googleLoading}
-            className="w-full flex items-center justify-center gap-3 bg-white hover:bg-gray-100 text-gray-900 font-semibold py-3 rounded-xl transition mb-6 disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-3 bg-white hover:bg-gray-50 dark:bg-white dark:hover:bg-gray-100 text-gray-900 font-semibold py-3 rounded-xl transition mb-6 disabled:opacity-50 border border-gray-200"
           >
             <svg width="18" height="18" viewBox="0 0 18 18">
               <path fill="#4285F4" d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 0 0 2.38-5.88c0-.57-.05-.66-.15-1.18z"/>
@@ -103,33 +108,33 @@ export default function LoginPage() {
 
           {/* Divider */}
           <div className="flex items-center gap-3 mb-6">
-            <div className="flex-1 h-px bg-white/5"></div>
-            <span className="text-gray-600 text-xs">or sign in with email</span>
-            <div className="flex-1 h-px bg-white/5"></div>
+            <div className="flex-1 h-px bg-gray-200 dark:bg-white/5"></div>
+            <span className="text-gray-400 dark:text-gray-600 text-xs">or sign in with email</span>
+            <div className="flex-1 h-px bg-gray-200 dark:bg-white/5"></div>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-5">
 
             <motion.div variants={fadeUp}>
-              <label className="text-sm text-gray-400 mb-1.5 block font-medium">Email</label>
+              <label className="text-sm text-gray-600 dark:text-gray-400 mb-1.5 block font-medium">Email</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full bg-gray-800 text-white rounded-xl px-4 py-3 border border-white/5 focus:outline-none focus:border-indigo-500 transition placeholder-gray-600"
+                className="w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl px-4 py-3 border border-gray-200 dark:border-white/5 focus:outline-none focus:border-indigo-500 transition placeholder-gray-400 dark:placeholder-gray-600"
                 placeholder="you@example.com"
               />
             </motion.div>
 
             <motion.div variants={fadeUp}>
-              <label className="text-sm text-gray-400 mb-1.5 block font-medium">Password</label>
+              <label className="text-sm text-gray-600 dark:text-gray-400 mb-1.5 block font-medium">Password</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full bg-gray-800 text-white rounded-xl px-4 py-3 border border-white/5 focus:outline-none focus:border-indigo-500 transition placeholder-gray-600"
+                className="w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl px-4 py-3 border border-gray-200 dark:border-white/5 focus:outline-none focus:border-indigo-500 transition placeholder-gray-400 dark:placeholder-gray-600"
                 placeholder="••••••••"
               />
             </motion.div>
@@ -138,7 +143,7 @@ export default function LoginPage() {
               <motion.p
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="text-red-400 text-sm bg-red-400/10 border border-red-400/20 rounded-lg px-4 py-2"
+                className="text-red-500 text-sm bg-red-50 dark:bg-red-400/10 border border-red-200 dark:border-red-400/20 rounded-lg px-4 py-2"
               >
                 {error}
               </motion.p>
@@ -157,9 +162,9 @@ export default function LoginPage() {
 
           </form>
 
-          <motion.p variants={fadeUp} className="text-gray-500 text-sm text-center mt-6">
+          <motion.p variants={fadeUp} className="text-gray-500 dark:text-gray-500 text-sm text-center mt-6">
             Don't have an account?{' '}
-            <Link href="/signup" className="text-indigo-400 hover:text-indigo-300 font-medium transition">
+            <Link href="/signup" className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 font-medium transition">
               Sign up free
             </Link>
           </motion.p>
