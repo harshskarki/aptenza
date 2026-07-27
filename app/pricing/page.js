@@ -217,7 +217,7 @@ export default function PricingPage() {
               whileHover={{ scale: 1.02 }}
               className={`rounded-2xl p-8 flex flex-col relative transition-colors ${
                 plan.highlight
-                  ? 'bg-indigo-950 border border-indigo-700'
+                  ? 'bg-indigo-100 dark:bg-indigo-950 border border-indigo-300 dark:border-indigo-700'
                   : 'bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-white/5'
               }`}
             >
