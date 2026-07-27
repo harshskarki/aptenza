@@ -45,7 +45,7 @@ export default function LandingPage() {
 
       {/* Progress bar */}
       <motion.div
-        className="fixed top-0 left-0 right-0 h-0.5 bg-indigo-600 z-[100] origin-left"
+        className="fixed top-0 left-0 right-0 h-0.5 bg-indigo-600 z-100 origin-left"
         style={{ scaleX: scrollYProgress }}
       />
 
@@ -79,7 +79,7 @@ export default function LandingPage() {
 
       {/* Hero */}
       <section className="min-h-screen flex flex-col items-center justify-center px-6 pt-24 pb-16 relative">
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-600/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-150 h-150 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none" />
 
         <motion.div style={{ y: heroY }} className="relative z-10 text-center max-w-4xl mx-auto">
           <motion.div
@@ -100,7 +100,7 @@ export default function LandingPage() {
           >
             Stop fumbling.
             <br />
-            <span className="bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-indigo-500 via-purple-500 to-indigo-500 bg-clip-text text-transparent">
               Start cracking.
             </span>
           </motion.h1>
@@ -166,7 +166,7 @@ export default function LandingPage() {
             </div>
             <div className="p-6 space-y-4">
               <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 1.0, duration: 0.5 }} className="flex gap-3">
-                <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0">AI</div>
+                <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0">AI</div>
                 <div className="bg-gray-100 dark:bg-gray-800 rounded-2xl rounded-tl-none px-4 py-3 text-sm text-gray-700 dark:text-gray-200 max-w-sm">
                   Given an array of integers, return indices of two numbers that add up to target. What's your approach?
                 </div>
@@ -175,10 +175,10 @@ export default function LandingPage() {
                 <div className="bg-indigo-600 rounded-2xl rounded-tr-none px-4 py-3 text-sm text-white max-w-sm">
                   I'd use a hash map to store values as I iterate — O(n) time complexity.
                 </div>
-                <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">U</div>
+                <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center text-xs font-bold shrink-0">U</div>
               </motion.div>
               <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 1.4, duration: 0.5 }} className="flex gap-3">
-                <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0">AI</div>
+                <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0">AI</div>
                 <div className="bg-gray-100 dark:bg-gray-800 rounded-2xl rounded-tl-none px-4 py-3 text-sm text-gray-700 dark:text-gray-200 max-w-sm">
                   Good! Now what about space complexity, and can you handle duplicates?
                 </div>
@@ -239,7 +239,7 @@ export default function LandingPage() {
           <motion.div
             variants={fadeUp}
             whileHover={{ scale: 1.02 }}
-            className="bg-gradient-to-br from-indigo-50 dark:from-indigo-950/50 to-gray-50 dark:to-gray-900 rounded-2xl p-8 border border-indigo-200 dark:border-indigo-500/20 md:col-span-2 transition-colors"
+            className="bg-linear-to-br from-indigo-50 dark:from-indigo-950/50 to-gray-50 dark:to-gray-900 rounded-2xl p-8 border border-indigo-200 dark:border-indigo-500/20 md:col-span-2 transition-colors"
           >
             <div className="flex items-start gap-6">
               <div className="text-5xl">🤖</div>
@@ -323,7 +323,7 @@ export default function LandingPage() {
 
       {/* CTA */}
       <section className="max-w-3xl mx-auto px-6 py-24 text-center relative">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-indigo-600/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-100 h-100 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none" />
         <motion.div
           variants={fadeUp}
           initial="hidden"
