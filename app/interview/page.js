@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import { motion, AnimatePresence } from 'framer-motion'
+import ThemeToggle from '@/components/ThemeToggle'
 
 function InterviewContent() {
   const [messages, setMessages] = useState([])
@@ -21,16 +22,9 @@ function InterviewContent() {
     async function checkUser() {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        router.push('/login')
-        return
-      }
+      if (!user) { router.push('/login'); return }
       setUser(user)
-      const { data: profileData } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single()
+      const { data: profileData } = await supabase.from('profiles').select('*').eq('id', user.id).single()
       setProfile(profileData)
       const type = searchParams.get('type')
       if (type) setInterviewType(type)
@@ -62,17 +56,10 @@ function InterviewContent() {
     const scoreMatch = lastResponse.match(/(\d+)\/10/)
     const score = scoreMatch ? parseInt(scoreMatch[1]) : null
     await supabase.from('sessions').insert({
-      user_id: user.id,
-      type: interviewType,
-      status: 'completed',
-      score: score,
-      feedback: lastResponse,
-      transcript: messages
+      user_id: user.id, type: interviewType, status: 'completed',
+      score, feedback: lastResponse, transcript: messages
     })
-    await supabase
-      .from('profiles')
-      .update({ interviews_used: (profile?.interviews_used || 0) + 1 })
-      .eq('id', user.id)
+    await supabase.from('profiles').update({ interviews_used: (profile?.interviews_used || 0) + 1 }).eq('id', user.id)
   }
 
   async function sendMessage() {
@@ -93,20 +80,13 @@ function InterviewContent() {
     setLoading(false)
     if (updatedMessages.length >= 6) {
       await saveSession(updatedMessages, data.message)
-      
-      // Check if there's a queue to continue
       const fromQueue = searchParams.get('fromQueue')
       if (fromQueue) {
         const saved = sessionStorage.getItem('practiceQueue')
         const remaining = saved ? JSON.parse(saved) : []
-        
         setTimeout(() => {
-          if (remaining.length > 0) {
-            router.push('/practice-queue')
-          } else {
-            sessionStorage.removeItem('practiceQueue')
-            router.push('/dashboard')
-          }
+          if (remaining.length > 0) { router.push('/practice-queue') }
+          else { sessionStorage.removeItem('practiceQueue'); router.push('/dashboard') }
         }, 3000)
       }
     }
@@ -114,22 +94,16 @@ function InterviewContent() {
 
   function handleEndInterview() {
     const fromQueue = searchParams.get('fromQueue')
-    
     if (fromQueue) {
       const saved = sessionStorage.getItem('practiceQueue')
       const remaining = saved ? JSON.parse(saved) : []
-      
-      if (remaining.length > 0) {
-        router.push('/practice-queue')
-      } else {
-        sessionStorage.removeItem('practiceQueue')
-        router.push('/dashboard')
-      }
+      if (remaining.length > 0) { router.push('/practice-queue') }
+      else { sessionStorage.removeItem('practiceQueue'); router.push('/dashboard') }
     } else {
       router.push('/dashboard')
     }
   }
-  
+
   const typeLabels = {
     dsa: '💻 DSA Interview',
     behavioral: '🧠 Behavioral Interview',
@@ -139,10 +113,9 @@ function InterviewContent() {
 
   if (!sessionStarted) {
     return (
-      <main className="min-h-screen bg-gray-950 flex items-center justify-center px-4 relative overflow-hidden">
-
-        {/* Background glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-3xl pointer-events-none" />
+      <main className="min-h-screen bg-white dark:bg-gray-950 flex items-center justify-center px-4 relative overflow-hidden transition-colors duration-300">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-125 h-125 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none hidden dark:block" />
+        <div className="absolute top-4 right-4"><ThemeToggle /></div>
 
         <motion.div
           initial={{ opacity: 0, y: 40 }}
@@ -151,26 +124,24 @@ function InterviewContent() {
           className="w-full max-w-md text-center relative z-10"
         >
           <div className="flex items-center justify-center gap-2 mb-8">
-            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-sm font-black">A</div>
-            <span className="text-xl font-bold">Aptenza</span>
+            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-sm font-black text-white">A</div>
+            <span className="text-xl font-bold text-gray-900 dark:text-white">Aptenza</span>
           </div>
 
-          <h1 className="text-4xl font-black text-white mb-2">Mock Interview</h1>
-          <p className="text-gray-400 mb-8">Select your type and start when ready.</p>
+          <h1 className="text-4xl font-black text-gray-900 dark:text-white mb-2">Mock Interview</h1>
+          <p className="text-gray-500 dark:text-gray-400 mb-8">Select your type and start when ready.</p>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.6 }}
-            className="bg-gray-900 rounded-2xl p-8 border border-white/5 shadow-2xl"
+            className="bg-gray-50 dark:bg-gray-900 rounded-2xl p-8 border border-gray-200 dark:border-white/5 shadow-sm dark:shadow-2xl transition-colors"
           >
-            <label className="text-sm text-gray-400 mb-2 block text-left font-medium">
-              Interview type
-            </label>
+            <label className="text-sm text-gray-600 dark:text-gray-400 mb-2 block text-left font-medium">Interview type</label>
             <select
               value={interviewType}
               onChange={(e) => setInterviewType(e.target.value)}
-              className="w-full bg-gray-800 text-white rounded-xl px-4 py-3 border border-white/5 focus:outline-none focus:border-indigo-500 mb-6 transition"
+              className="w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl px-4 py-3 border border-gray-200 dark:border-white/5 focus:outline-none focus:border-indigo-500 mb-6 transition"
             >
               <option value="dsa">💻 DSA Interview</option>
               <option value="behavioral">🧠 Behavioral Interview</option>
@@ -189,7 +160,7 @@ function InterviewContent() {
 
             <button
               onClick={() => router.push('/dashboard')}
-              className="w-full mt-3 text-gray-500 hover:text-white text-sm transition py-2"
+              className="w-full mt-3 text-gray-400 hover:text-gray-900 dark:hover:text-white text-sm transition py-2"
             >
               ← Back to dashboard
             </button>
@@ -200,35 +171,33 @@ function InterviewContent() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-950 flex flex-col">
+    <main className="min-h-screen bg-white dark:bg-gray-950 flex flex-col transition-colors duration-300">
 
-      {/* Header */}
       <motion.nav
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        className="border-b border-white/5 px-6 py-4 flex items-center justify-between bg-gray-950/80 backdrop-blur-md sticky top-0 z-10"
+        className="border-b border-gray-200 dark:border-white/5 px-6 py-4 flex items-center justify-between bg-white dark:bg-gray-950 sticky top-0 z-10 transition-colors"
       >
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center text-xs font-black">A</div>
-          <span className="text-lg font-bold">Aptenza</span>
+          <div className="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center text-xs font-black text-white">A</div>
+          <span className="text-lg font-bold text-gray-900 dark:text-white">Aptenza</span>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-gray-400 text-sm">{typeLabels[interviewType]}</span>
+          <span className="text-gray-500 dark:text-gray-400 text-sm">{typeLabels[interviewType]}</span>
           <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-          <span className="text-green-400 text-xs">Live</span>
+          <span className="text-green-500 text-xs">Live</span>
+          <ThemeToggle />
         </div>
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.97 }}
           onClick={handleEndInterview}
-          className="text-sm bg-gray-800 hover:bg-red-900 text-gray-300 hover:text-red-300 px-4 py-1.5 rounded-lg transition"
+          className="text-sm bg-gray-100 dark:bg-gray-800 hover:bg-red-100 dark:hover:bg-red-900 text-gray-600 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-300 px-4 py-1.5 rounded-lg transition"
         >
           End interview
         </motion.button>
       </motion.nav>
 
-      {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-6 max-w-3xl mx-auto w-full">
         <AnimatePresence>
           {messages.map((msg, i) => (
@@ -240,53 +209,41 @@ function InterviewContent() {
               className={`mb-4 flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               {msg.role === 'assistant' && (
-                <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center text-xs font-bold mr-2 flex-shrink-0 mt-1">AI</div>
+                <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center text-xs font-bold text-white mr-2 shrink-0 mt-1">AI</div>
               )}
-              <div
-                className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap ${
-                  msg.role === 'user'
-                    ? 'bg-indigo-600 text-white rounded-tr-none'
-                    : 'bg-gray-900 text-gray-100 border border-white/5 rounded-tl-none'
-                }`}
-              >
+              <div className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap ${
+                msg.role === 'user'
+                  ? 'bg-indigo-600 text-white rounded-tr-none'
+                  : 'bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 border border-gray-200 dark:border-white/5 rounded-tl-none'
+              }`}>
                 {msg.content}
               </div>
               {msg.role === 'user' && (
-                <div className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center text-xs font-bold ml-2 flex-shrink-0 mt-1">U</div>
+                <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center text-xs font-bold ml-2 shrink-0 mt-1">U</div>
               )}
             </motion.div>
           ))}
         </AnimatePresence>
 
         {loading && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex justify-start mb-4"
-          >
-            <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center text-xs font-bold mr-2 flex-shrink-0">AI</div>
-            <div className="bg-gray-900 border border-white/5 rounded-2xl rounded-tl-none px-4 py-3 flex items-center gap-1.5">
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex justify-start mb-4">
+            <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center text-xs font-bold text-white mr-2 shrink-0">AI</div>
+            <div className="bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-white/5 rounded-2xl rounded-tl-none px-4 py-3 flex items-center gap-1.5">
               {[0, 1, 2].map(i => (
-                <motion.div
-                  key={i}
-                  animate={{ y: [0, -6, 0] }}
-                  transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.15 }}
-                  className="w-1.5 h-1.5 bg-indigo-400 rounded-full"
-                />
+                <motion.div key={i} animate={{ y: [0, -6, 0] }} transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.15 }}
+                  className="w-1.5 h-1.5 bg-indigo-400 rounded-full" />
               ))}
             </div>
           </motion.div>
         )}
-
         <div ref={bottomRef} />
       </div>
 
-      {/* Input */}
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.3, duration: 0.5 }}
-        className="border-t border-white/5 px-4 py-4 bg-gray-950"
+        className="border-t border-gray-200 dark:border-white/5 px-4 py-4 bg-white dark:bg-gray-950 transition-colors"
       >
         <div className="max-w-3xl mx-auto flex gap-3">
           <input
@@ -295,7 +252,7 @@ function InterviewContent() {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
             placeholder="Type your answer..."
-            className="flex-1 bg-gray-900 text-white rounded-xl px-4 py-3 border border-white/5 focus:outline-none focus:border-indigo-500 transition text-sm placeholder-gray-600"
+            className="flex-1 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white rounded-xl px-4 py-3 border border-gray-200 dark:border-white/5 focus:outline-none focus:border-indigo-500 transition text-sm placeholder-gray-400 dark:placeholder-gray-600"
           />
           <motion.button
             whileHover={{ scale: 1.05 }}
@@ -308,7 +265,6 @@ function InterviewContent() {
           </motion.button>
         </div>
       </motion.div>
-
     </main>
   )
 }
@@ -316,12 +272,9 @@ function InterviewContent() {
 export default function InterviewPage() {
   return (
     <Suspense fallback={
-      <main className="min-h-screen bg-gray-950 flex items-center justify-center">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-          className="w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full"
-        />
+      <main className="min-h-screen bg-white dark:bg-gray-950 flex items-center justify-center">
+        <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+          className="w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full" />
       </main>
     }>
       <InterviewContent />
