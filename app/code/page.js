@@ -5,8 +5,9 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import { motion } from 'framer-motion'
 import dynamic from 'next/dynamic'
+import ThemeToggle from '@/components/ThemeToggle'
+import { useTheme } from 'next-themes'
 
-// Monaco must be loaded dynamically (no SSR)
 const MonacoEditor = dynamic(() => import('@monaco-editor/react'), { ssr: false })
 
 const DSA_PROBLEMS = [
@@ -14,161 +15,68 @@ const DSA_PROBLEMS = [
     id: 1,
     title: 'Two Sum',
     difficulty: 'Easy',
-    description: `Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.
-
-You may assume that each input would have exactly one solution, and you may not use the same element twice.
-
-Example:
-Input: nums = [2,7,11,15], target = 9
-Output: [0,1]
-Explanation: nums[0] + nums[1] == 9, so return [0, 1].`,
+    description: `Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.\n\nYou may assume that each input would have exactly one solution, and you may not use the same element twice.\n\nExample:\nInput: nums = [2,7,11,15], target = 9\nOutput: [0,1]`,
+    hint: 'Think about using a Hash Map to store values and their indices as you iterate once through the array.',
     starterCode: {
-      javascript: `/**
- * @param {number[]} nums
- * @param {number} target
- * @return {number[]}
- */
-function twoSum(nums, target) {
-  // Write your solution here
-  
-};`,
-      python: `def two_sum(nums: list[int], target: int) -> list[int]:
-    # Write your solution here
-    pass`,
-      java: `class Solution {
-    public int[] twoSum(int[] nums, int target) {
-        // Write your solution here
-        
-    }
-}`
+      javascript: `function twoSum(nums, target) {\n  // Write your solution here\n  \n};\n\n// Test it\nconsole.log(twoSum([2, 7, 11, 15], 9)) // [0, 1]`,
+      python: `def two_sum(nums: list[int], target: int) -> list[int]:\n    # Write your solution here\n    pass`,
+      java: `class Solution {\n    public int[] twoSum(int[] nums, int target) {\n        // Write your solution here\n        \n    }\n}`
     }
   },
   {
     id: 2,
     title: 'Maximum Subarray',
     difficulty: 'Medium',
-    description: `Given an integer array nums, find the subarray with the largest sum, and return its sum.
-
-Example:
-Input: nums = [-2,1,-3,4,-1,2,1,-5,4]
-Output: 6
-Explanation: The subarray [4,-1,2,1] has the largest sum 6.`,
+    description: `Given an integer array nums, find the subarray with the largest sum, and return its sum.\n\nExample:\nInput: nums = [-2,1,-3,4,-1,2,1,-5,4]\nOutput: 6`,
+    hint: "Kadane's Algorithm: track the current subarray sum and the maximum seen so far.",
     starterCode: {
-      javascript: `/**
- * @param {number[]} nums
- * @return {number}
- */
-function maxSubArray(nums) {
-  // Write your solution here
-  
-};`,
-      python: `def max_sub_array(nums: list[int]) -> int:
-    # Write your solution here
-    pass`,
-      java: `class Solution {
-    public int maxSubArray(int[] nums) {
-        // Write your solution here
-        
-    }
-}`
+      javascript: `function maxSubArray(nums) {\n  // Write your solution here\n  \n};\n\nconsole.log(maxSubArray([-2,1,-3,4,-1,2,1,-5,4])) // 6`,
+      python: `def max_sub_array(nums: list[int]) -> int:\n    # Write your solution here\n    pass`,
+      java: `class Solution {\n    public int maxSubArray(int[] nums) {\n        // Write your solution here\n        \n    }\n}`
     }
   },
   {
     id: 3,
     title: 'Valid Palindrome',
     difficulty: 'Easy',
-    description: `A phrase is a palindrome if, after converting all uppercase letters into lowercase letters and removing all non-alphanumeric characters, it reads the same forward and backward.
-
-Given a string s, return true if it is a palindrome, or false otherwise.
-
-Example:
-Input: s = "A man, a plan, a canal: Panama"
-Output: true`,
+    description: `A phrase is a palindrome if, after converting all uppercase letters into lowercase letters and removing all non-alphanumeric characters, it reads the same forward and backward.\n\nExample:\nInput: s = "A man, a plan, a canal: Panama"\nOutput: true`,
+    hint: 'Use two pointers — one from the start, one from the end. Skip non-alphanumeric characters.',
     starterCode: {
-      javascript: `/**
- * @param {string} s
- * @return {boolean}
- */
-function isPalindrome(s) {
-  // Write your solution here
-  
-};`,
-      python: `def is_palindrome(s: str) -> bool:
-    # Write your solution here
-    pass`,
-      java: `class Solution {
-    public boolean isPalindrome(String s) {
-        // Write your solution here
-        
-    }
-}`
+      javascript: `function isPalindrome(s) {\n  // Write your solution here\n  \n};\n\nconsole.log(isPalindrome("A man, a plan, a canal: Panama")) // true`,
+      python: `def is_palindrome(s: str) -> bool:\n    # Write your solution here\n    pass`,
+      java: `class Solution {\n    public boolean isPalindrome(String s) {\n        // Write your solution here\n        \n    }\n}`
     }
   },
   {
     id: 4,
     title: 'Reverse Linked List',
     difficulty: 'Easy',
-    description: `Given the head of a singly linked list, reverse the list, and return the reversed list.
-
-Example:
-Input: head = [1,2,3,4,5]
-Output: [5,4,3,2,1]`,
+    description: `Given the head of a singly linked list, reverse the list, and return the reversed list.\n\nExample:\nInput: head = [1,2,3,4,5]\nOutput: [5,4,3,2,1]`,
+    hint: 'Iteratively: use three pointers (prev, curr, next). Track carefully to avoid losing references.',
     starterCode: {
-      javascript: `/**
- * @param {ListNode} head
- * @return {ListNode}
- */
-function reverseList(head) {
-  // Write your solution here
-  
-};`,
-      python: `def reverse_list(head):
-    # Write your solution here
-    pass`,
-      java: `class Solution {
-    public ListNode reverseList(ListNode head) {
-        // Write your solution here
-        
-    }
-}`
+      javascript: `function reverseList(head) {\n  // Write your solution here\n  \n};`,
+      python: `def reverse_list(head):\n    # Write your solution here\n    pass`,
+      java: `class Solution {\n    public ListNode reverseList(ListNode head) {\n        // Write your solution here\n        \n    }\n}`
     }
   },
   {
     id: 5,
-    title: 'Longest Substring Without Repeating Characters',
+    title: 'Longest Substring',
     difficulty: 'Medium',
-    description: `Given a string s, find the length of the longest substring without repeating characters.
-
-Example:
-Input: s = "abcabcbb"
-Output: 3
-Explanation: The answer is "abc", with the length of 3.`,
+    description: `Given a string s, find the length of the longest substring without repeating characters.\n\nExample:\nInput: s = "abcabcbb"\nOutput: 3 (The answer is "abc")`,
+    hint: 'Sliding window with a Hash Set: expand right, shrink left when you see a repeat.',
     starterCode: {
-      javascript: `/**
- * @param {string} s
- * @return {number}
- */
-function lengthOfLongestSubstring(s) {
-  // Write your solution here
-  
-};`,
-      python: `def length_of_longest_substring(s: str) -> int:
-    # Write your solution here
-    pass`,
-      java: `class Solution {
-    public int lengthOfLongestSubstring(String s) {
-        // Write your solution here
-        
-    }
-}`
+      javascript: `function lengthOfLongestSubstring(s) {\n  // Write your solution here\n  \n};\n\nconsole.log(lengthOfLongestSubstring("abcabcbb")) // 3`,
+      python: `def length_of_longest_substring(s: str) -> int:\n    # Write your solution here\n    pass`,
+      java: `class Solution {\n    public int lengthOfLongestSubstring(String s) {\n        // Write your solution here\n        \n    }\n}`
     }
   }
 ]
 
 const difficultyColors = {
-  Easy: 'text-green-400 bg-green-400/10',
-  Medium: 'text-yellow-400 bg-yellow-400/10',
-  Hard: 'text-red-400 bg-red-400/10'
+  Easy: 'text-green-500 bg-green-50 dark:bg-green-900/20',
+  Medium: 'text-yellow-500 bg-yellow-50 dark:bg-yellow-900/20',
+  Hard: 'text-red-500 bg-red-50 dark:bg-red-900/20'
 }
 
 export default function CodePage() {
@@ -178,16 +86,15 @@ export default function CodePage() {
   const [output, setOutput] = useState('')
   const [running, setRunning] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [showHint, setShowHint] = useState(false)
   const router = useRouter()
+  const { theme } = useTheme()
 
   useEffect(() => {
     async function checkUser() {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        router.push('/login')
-        return
-      }
+      if (!user) { router.push('/login'); return }
       setLoading(false)
     }
     checkUser()
@@ -197,6 +104,7 @@ export default function CodePage() {
     setSelectedProblem(problem)
     setCode(problem.starterCode[language])
     setOutput('')
+    setShowHint(false)
   }
 
   function handleLanguageChange(lang) {
@@ -208,82 +116,64 @@ export default function CodePage() {
   function runCode() {
     setRunning(true)
     setOutput('')
-
     setTimeout(() => {
       if (language === 'javascript') {
         try {
-          // Capture console.log output
           const logs = []
           const originalLog = console.log
           console.log = (...args) => logs.push(args.join(' '))
-
           // eslint-disable-next-line no-new-func
-          const fn = new Function(code + '\n// Test run')
-          fn()
-
+          new Function(code)()
           console.log = originalLog
-          setOutput(logs.length > 0
-            ? logs.join('\n')
-            : '✅ Code ran without errors.\n💡 Add console.log() statements to see output.'
-          )
+          setOutput(logs.length > 0 ? logs.join('\n') : '✅ Code ran without errors.\n💡 Add console.log() to see output.')
         } catch (err) {
           setOutput(`❌ Error: ${err.message}`)
         }
       } else {
-        setOutput(`ℹ️ Live execution is available for JavaScript only in the browser.\n\nFor Python/Java, copy your code and test it in your local environment or on LeetCode.`)
+        setOutput(`ℹ️ Live execution is available for JavaScript only.\n\nFor Python/Java, test locally or on LeetCode.`)
       }
       setRunning(false)
     }, 800)
   }
 
-  function resetCode() {
-    setCode(selectedProblem.starterCode[language])
-    setOutput('')
-  }
-
   if (loading) {
     return (
-      <main className="min-h-screen bg-gray-950 flex items-center justify-center">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-          className="w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full"
-        />
+      <main className="min-h-screen bg-white dark:bg-gray-950 flex items-center justify-center">
+        <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+          className="w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full" />
       </main>
     )
   }
 
   return (
-    <main className="min-h-screen bg-gray-950 text-white flex flex-col">
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white flex flex-col transition-colors duration-300">
 
       {/* Navbar */}
       <motion.nav
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="border-b border-white/5 px-6 py-3 flex items-center justify-between flex-shrink-0"
+        className="border-b border-gray-200 dark:border-white/5 px-6 py-3 flex items-center justify-between shrink-0 bg-white dark:bg-gray-950 transition-colors"
       >
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center text-xs font-black">A</div>
+            <div className="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center text-xs font-black text-white">A</div>
             <span className="text-lg font-bold">Aptenza</span>
           </div>
-          <span className="text-gray-600">|</span>
-          <span className="text-gray-400 text-sm">Code Editor</span>
+          <span className="text-gray-300 dark:text-gray-600">|</span>
+          <span className="text-gray-500 dark:text-gray-400 text-sm">Code Editor</span>
         </div>
         <div className="flex items-center gap-3">
           <select
             value={language}
             onChange={(e) => handleLanguageChange(e.target.value)}
-            className="bg-gray-800 text-white text-sm rounded-lg px-3 py-1.5 border border-white/5 focus:outline-none focus:border-indigo-500"
+            className="bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white text-sm rounded-lg px-3 py-1.5 border border-gray-200 dark:border-white/5 focus:outline-none focus:border-indigo-500"
           >
             <option value="javascript">JavaScript</option>
             <option value="python">Python</option>
             <option value="java">Java</option>
           </select>
-          <button
-            onClick={() => router.push('/dashboard')}
-            className="text-sm text-gray-400 hover:text-white transition"
-          >
+          <ThemeToggle />
+          <button onClick={() => router.push('/dashboard')} className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition">
             ← Dashboard
           </button>
         </div>
@@ -292,9 +182,9 @@ export default function CodePage() {
       <div className="flex flex-1 overflow-hidden">
 
         {/* Problem list sidebar */}
-        <div className="w-64 border-r border-white/5 flex-shrink-0 overflow-y-auto">
+        <div className="w-64 border-r border-gray-200 dark:border-white/5 shrink-0 overflow-y-auto bg-white dark:bg-gray-950 transition-colors">
           <div className="p-4">
-            <p className="text-xs text-gray-500 font-medium uppercase tracking-wider mb-3">Problems</p>
+            <p className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-3">Problems</p>
             <div className="space-y-1">
               {DSA_PROBLEMS.map((problem) => (
                 <button
@@ -303,15 +193,11 @@ export default function CodePage() {
                   className={`w-full text-left px-3 py-2.5 rounded-xl text-sm transition ${
                     selectedProblem.id === problem.id
                       ? 'bg-indigo-600 text-white'
-                      : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                      : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
                   }`}
                 >
                   <div className="font-medium">{problem.title}</div>
-                  <div className={`text-xs mt-0.5 ${
-                    selectedProblem.id === problem.id
-                      ? 'text-indigo-200'
-                      : difficultyColors[problem.difficulty]?.split(' ')[0]
-                  }`}>
+                  <div className={`text-xs mt-0.5 ${selectedProblem.id === problem.id ? 'text-indigo-200' : difficultyColors[problem.difficulty]?.split(' ')[0]}`}>
                     {problem.difficulty}
                   </div>
                 </button>
@@ -320,11 +206,10 @@ export default function CodePage() {
           </div>
         </div>
 
-        {/* Main area */}
         <div className="flex-1 flex overflow-hidden">
 
           {/* Problem description */}
-          <div className="w-96 border-r border-white/5 flex-shrink-0 overflow-y-auto">
+          <div className="w-96 border-r border-gray-200 dark:border-white/5 shrink-0 overflow-y-auto bg-white dark:bg-gray-950 transition-colors">
             <div className="p-6">
               <div className="flex items-center gap-3 mb-4">
                 <h2 className="text-xl font-black">{selectedProblem.title}</h2>
@@ -332,61 +217,59 @@ export default function CodePage() {
                   {selectedProblem.difficulty}
                 </span>
               </div>
-              <p className="text-gray-300 text-sm leading-relaxed whitespace-pre-wrap">
+              <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed whitespace-pre-wrap mb-6">
                 {selectedProblem.description}
               </p>
-
-              <div className="mt-6 p-4 bg-gray-900 rounded-xl border border-white/5">
-                <p className="text-xs text-gray-500 mb-2 font-medium">💡 Hint</p>
-                <p className="text-gray-400 text-xs leading-relaxed">
-                  {selectedProblem.id === 1 && 'Think about using a Hash Map to store values and their indices as you iterate once through the array.'}
-                  {selectedProblem.id === 2 && "Kadane's Algorithm: track the current subarray sum and the maximum seen so far."}
-                  {selectedProblem.id === 3 && 'Use two pointers — one from the start, one from the end. Skip non-alphanumeric characters.'}
-                  {selectedProblem.id === 4 && 'Iteratively: use three pointers (prev, curr, next). Recursively: think about what the base case is.'}
-                  {selectedProblem.id === 5 && 'Sliding window with a Set: expand right, shrink left when you see a repeat.'}
-                </p>
-              </div>
+              <button
+                onClick={() => setShowHint(!showHint)}
+                className="text-xs text-indigo-500 hover:text-indigo-400 transition mb-2"
+              >
+                {showHint ? '▼ Hide hint' : '▶ Show hint'}
+              </button>
+              {showHint && (
+                <motion.div
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="p-4 bg-indigo-50 dark:bg-indigo-950/50 rounded-xl border border-indigo-200 dark:border-indigo-500/20"
+                >
+                  <p className="text-gray-600 dark:text-gray-300 text-xs leading-relaxed">💡 {selectedProblem.hint}</p>
+                </motion.div>
+              )}
             </div>
           </div>
 
           {/* Code editor + output */}
           <div className="flex-1 flex flex-col overflow-hidden">
-
-            {/* Editor */}
             <div className="flex-1 overflow-hidden">
               <MonacoEditor
                 height="100%"
                 language={language}
                 value={code}
                 onChange={(val) => setCode(val || '')}
-                theme="vs-dark"
+                theme={theme === 'dark' ? 'vs-dark' : 'vs-light'}
                 options={{
                   fontSize: 14,
                   minimap: { enabled: false },
                   scrollBeyondLastLine: false,
                   wordWrap: 'on',
                   lineNumbers: 'on',
-                  renderLineHighlight: 'all',
                   padding: { top: 16, bottom: 16 },
                   fontFamily: 'JetBrains Mono, Fira Code, monospace',
-                  fontLigatures: true,
                 }}
               />
             </div>
 
             {/* Output panel */}
-            <div className="border-t border-white/5 flex-shrink-0">
-              <div className="flex items-center justify-between px-4 py-2 border-b border-white/5">
-                <span className="text-xs text-gray-500 font-medium">Output</span>
+            <div className="border-t border-gray-200 dark:border-white/5 shrink-0">
+              <div className="flex items-center justify-between px-4 py-2 border-b border-gray-200 dark:border-white/5">
+                <span className="text-xs text-gray-400 font-medium">Output</span>
                 <div className="flex items-center gap-2">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={resetCode}
-                    className="text-xs text-gray-500 hover:text-white transition px-3 py-1 rounded-lg border border-white/5 hover:border-white/20"
+                  <button
+                    onClick={() => { setCode(selectedProblem.starterCode[language]); setOutput('') }}
+                    className="text-xs text-gray-400 hover:text-gray-900 dark:hover:text-white transition px-3 py-1 rounded-lg border border-gray-200 dark:border-white/5"
                   >
                     Reset
-                  </motion.button>
+                  </button>
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
@@ -396,28 +279,22 @@ export default function CodePage() {
                   >
                     {running ? (
                       <>
-                        <motion.div
-                          animate={{ rotate: 360 }}
-                          transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }}
-                          className="w-3 h-3 border border-white border-t-transparent rounded-full"
-                        />
+                        <motion.div animate={{ rotate: 360 }} transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }}
+                          className="w-3 h-3 border border-white border-t-transparent rounded-full" />
                         Running...
                       </>
-                    ) : (
-                      '▶ Run Code'
-                    )}
+                    ) : '▶ Run Code'}
                   </motion.button>
                 </div>
               </div>
-              <div className="px-4 py-3 h-28 overflow-y-auto">
+              <div className="px-4 py-3 h-28 overflow-y-auto bg-white dark:bg-gray-950 transition-colors">
                 {output ? (
-                  <pre className="text-sm text-gray-300 font-mono whitespace-pre-wrap">{output}</pre>
+                  <pre className="text-sm text-gray-700 dark:text-gray-300 font-mono whitespace-pre-wrap">{output}</pre>
                 ) : (
-                  <p className="text-gray-600 text-sm">Click "Run Code" to see output here.</p>
+                  <p className="text-gray-400 text-sm">Click "Run Code" to see output here.</p>
                 )}
               </div>
             </div>
-
           </div>
         </div>
       </div>
