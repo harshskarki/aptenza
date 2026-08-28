@@ -100,13 +100,24 @@ export default function DashboardPage() {
           <div className="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center text-xs font-black text-white">A</div>
           <span className="text-lg font-bold">Aptenza</span>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <button onClick={() => router.push('/analytics')} className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition">Analytics</button>
-          <button onClick={() => router.push('/search')} className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition">Search</button>
           <button onClick={() => router.push('/leaderboard')} className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition">Leaderboard</button>
-          <button onClick={() => router.push('/practice-queue')} className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition">Practice Queue</button>
-          <button onClick={() => router.push('/code')} className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition">Code Editor</button>
-          <button onClick={() => router.push('/star')} className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition">STAR Builder</button>
+
+          {/* Tools dropdown */}
+          <div className="relative group">
+            <button className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition flex items-center gap-1">
+              Tools ▾
+            </button>
+            <div className="absolute right-0 top-8 bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 rounded-xl shadow-lg p-2 min-w-44 hidden group-hover:block z-50">
+              <button onClick={() => router.push('/search')} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">🔍 Search</button>
+              <button onClick={() => router.push('/practice-queue')} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">📋 Practice Queue</button>
+              <button onClick={() => router.push('/code')} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">💻 Code Editor</button>
+              <button onClick={() => router.push('/whiteboard')} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">⚙️ Whiteboard</button>
+              <button onClick={() => router.push('/star')} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">🌟 STAR Builder</button>
+            </div>
+          </div>
+
           <ThemeToggle />
           <span onClick={() => router.push('/profile')} className="text-gray-500 dark:text-gray-400 text-sm cursor-pointer hover:text-gray-900 dark:hover:text-white transition">
             {profile?.full_name || profile?.email}
