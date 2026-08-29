@@ -94,15 +94,15 @@ export default function DashboardPage() {
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className="border-b border-gray-200 dark:border-white/5 px-6 py-4 flex items-center justify-between bg-white dark:bg-gray-950 transition-colors duration-300"
+        className="border-b border-gray-200 dark:border-white/5 px-4 sm:px-6 py-3 flex items-center justify-between bg-white dark:bg-gray-950 transition-colors duration-300"
       >
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center text-xs font-black text-white">A</div>
           <span className="text-lg font-bold">Aptenza</span>
         </div>
-        <div className="flex items-center gap-3">
-          <button onClick={() => router.push('/analytics')} className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition">Analytics</button>
-          <button onClick={() => router.push('/leaderboard')} className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition">Leaderboard</button>
+        <div className="flex items-center gap-2 sm:gap-3">
+          <button onClick={() => router.push('/analytics')} className="hidden sm:block text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition">Analytics</button>
+          <button onClick={() => router.push('/leaderboard')} className="hidden sm:block text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition">Leaderboard</button>
 
           {/* Tools dropdown */}
           <div className="relative group">
@@ -110,30 +110,35 @@ export default function DashboardPage() {
               Tools ▾
             </button>
             <div className="absolute right-0 top-8 bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 rounded-xl shadow-lg p-2 min-w-44 hidden group-hover:block z-50">
-              <button onClick={() => router.push('/search')} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">🔍 Search</button>
-              <button onClick={() => router.push('/practice-queue')} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">📋 Practice Queue</button>
-              <button onClick={() => router.push('/code')} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">💻 Code Editor</button>
-              <button onClick={() => router.push('/whiteboard')} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">⚙️ Whiteboard</button>
-              <button onClick={() => router.push('/star')} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">🌟 STAR Builder</button>
+              <button onClick={() => router.push('/analytics')} className="sm:hidden w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">📊 Analytics</button>
+              <button onClick={() => router.push('/leaderboard')} className="sm:hidden w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">🏆 Leaderboard</button>
+              <button onClick={() => router.push('/search')} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">🔍 Search</button>
+              <button onClick={() => router.push('/practice-queue')} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">📋 Practice Queue</button>
+              <button onClick={() => router.push('/code')} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">💻 Code Editor</button>
+              <button onClick={() => router.push('/whiteboard')} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">⚙️ Whiteboard</button>
+              <button onClick={() => router.push('/star')} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">🌟 STAR Builder</button>
+              <div className="border-t border-gray-100 dark:border-white/5 my-1"></div>
+              <button onClick={() => router.push('/profile')} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">👤 Profile</button>
+              <button onClick={handleLogout} className="w-full text-left text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 px-3 py-2 rounded-lg transition">🚪 Logout</button>
             </div>
           </div>
 
           <ThemeToggle />
-          <span onClick={() => router.push('/profile')} className="text-gray-500 dark:text-gray-400 text-sm cursor-pointer hover:text-gray-900 dark:hover:text-white transition">
-            {profile?.full_name || profile?.email}
+          <span onClick={() => router.push('/profile')} className="hidden sm:block text-gray-500 dark:text-gray-400 text-sm cursor-pointer hover:text-gray-900 dark:hover:text-white transition">
+            {profile?.full_name?.split(' ')[0] || profile?.email}
           </span>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.97 }}
             onClick={handleLogout}
-            className="text-sm bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 px-4 py-1.5 rounded-lg transition"
+            className="hidden sm:block text-sm bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 px-4 py-1.5 rounded-lg transition"
           >
             Logout
           </motion.button>
         </div>
       </motion.nav>
 
-      <div className="max-w-5xl mx-auto px-6 py-10">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
 
         {/* Welcome */}
         <motion.div variants={stagger} initial="hidden" animate="visible" className="mb-10">
@@ -146,7 +151,7 @@ export default function DashboardPage() {
         </motion.div>
 
         {/* Stats */}
-        <motion.div variants={stagger} initial="hidden" animate="visible" className="grid grid-cols-3 gap-4 mb-10">
+        <motion.div variants={stagger} initial="hidden" animate="visible" className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
           {[
             { label: 'Interviews done', value: profile?.interviews_used || 0 },
             { label: 'Current plan', value: profile?.plan || 'Free' },
@@ -225,7 +230,7 @@ export default function DashboardPage() {
           Start a mock interview
         </motion.h3>
 
-        <motion.div variants={stagger} initial="hidden" animate="visible" className="grid grid-cols-2 gap-4">
+        <motion.div variants={stagger} initial="hidden" animate="visible" className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {interviewTypes.map((item, i) => (
             <motion.div
               key={i}

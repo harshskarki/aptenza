@@ -88,7 +88,7 @@ export default function AnalyticsPage() {
         </div>
       </motion.nav>
 
-      <div className="max-w-5xl mx-auto px-6 py-10">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
 
         {/* Header */}
         <motion.div variants={stagger} initial="hidden" animate="visible" className="mb-10">
@@ -97,7 +97,7 @@ export default function AnalyticsPage() {
         </motion.div>
 
         {/* Stats */}
-        <motion.div variants={stagger} initial="hidden" animate="visible" className="grid grid-cols-4 gap-4 mb-10">
+        <motion.div variants={stagger} initial="hidden" animate="visible" className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-10">
           {[
             { label: 'Total interviews', value: sessions.length },
             { label: 'Average score', value: getAverageScore() > 0 ? `${getAverageScore()}/10` : 'N/A' },
@@ -121,7 +121,7 @@ export default function AnalyticsPage() {
           className="bg-white dark:bg-gray-900 rounded-xl p-6 border border-gray-200 dark:border-white/5 mb-8 transition-colors"
         >
           <h3 className="text-lg font-bold mb-6">Interviews by type</h3>
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {Object.entries(typeLabels).map(([type, label], i) => (
               <motion.div
                 key={type}

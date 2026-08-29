@@ -211,7 +211,7 @@ function InterviewContent() {
               {msg.role === 'assistant' && (
                 <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center text-xs font-bold text-white mr-2 shrink-0 mt-1">AI</div>
               )}
-              <div className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap ${
+              <div className={`max-w-[90%] sm:max-w-[80%] rounded-2xl px-3 sm:px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap ${
                 msg.role === 'user'
                   ? 'bg-indigo-600 text-white rounded-tr-none'
                   : 'bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 border border-gray-200 dark:border-white/5 rounded-tl-none'
@@ -245,7 +245,7 @@ function InterviewContent() {
         transition={{ delay: 0.3, duration: 0.5 }}
         className="border-t border-gray-200 dark:border-white/5 px-4 py-4 bg-white dark:bg-gray-950 transition-colors"
       >
-        <div className="max-w-3xl mx-auto flex gap-3">
+        <div className="max-w-3xl mx-auto flex gap-2 sm:gap-3">
           <input
             type="text"
             value={input}

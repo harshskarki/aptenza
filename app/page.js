@@ -96,7 +96,7 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.7 }}
-            className="text-6xl md:text-7xl font-black leading-[1.05] tracking-tight mb-6"
+            className="text-4xl sm:text-6xl md:text-7xl font-black leading-[1.05] tracking-tight mb-6"
           >
             Stop fumbling.
             <br />
@@ -234,7 +234,7 @@ export default function LandingPage() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: '-100px' }}
-          className="grid grid-cols-1 md:grid-cols-2 gap-6"
+          className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6"
         >
           <motion.div
             variants={fadeUp}
@@ -291,7 +291,7 @@ export default function LandingPage() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: '-100px' }}
-            className="grid grid-cols-1 md:grid-cols-3 gap-6"
+            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6"
           >
             {[
               { initial: 'R', name: 'Rahul M.', role: 'SDE · Bangalore', color: 'bg-indigo-700', border: 'border-gray-200 dark:border-white/5', text: '"I practiced DSA interviews on Aptenza for 3 weeks. Got an offer from a product company in Bangalore. The AI feedback was genuinely helpful."' },
@@ -331,7 +331,7 @@ export default function LandingPage() {
           viewport={{ once: true }}
           className="relative z-10"
         >
-          <h2 className="text-5xl font-black mb-4">Your offer is waiting.</h2>
+          <h2 className="text-3xl sm:text-5xl font-black mb-4">Your offer is waiting.</h2>
           <p className="text-gray-500 text-xl mb-10">Start with 3 free interviews. No credit card. No excuses.</p>
           <motion.button
             whileHover={{ scale: 1.05, boxShadow: '0 0 40px rgba(99,102,241,0.5)' }}
