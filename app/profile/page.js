@@ -123,7 +123,7 @@ export default function ProfilePage() {
         </div>
       </motion.nav>
 
-      <div className="max-w-3xl mx-auto px-6 py-10">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
 
         {/* Profile header */}
         <motion.div variants={fadeUp} initial="hidden" animate="visible"
@@ -178,7 +178,7 @@ export default function ProfilePage() {
         </motion.div>
 
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
           {[
             { label: 'Interviews done', value: sessions.length },
             { label: 'Average score', value: getAverageScore() },

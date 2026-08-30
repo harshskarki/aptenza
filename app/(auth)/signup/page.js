@@ -70,7 +70,7 @@ export default function SignupPage() {
         variants={stagger}
         initial="hidden"
         animate="visible"
-        className="w-full max-w-md relative z-10"
+        className="w-full max-w-md relative z-10 px-2 sm:px-0"
       >
         <motion.div variants={fadeUp} className="text-center mb-8">
           <div

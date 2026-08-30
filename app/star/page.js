@@ -127,7 +127,7 @@ export default function StarPage() {
         </div>
       </motion.nav>
 
-      <div className="max-w-4xl mx-auto px-6 py-10">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
 
         {/* Header */}
         <motion.div variants={fadeUp} initial="hidden" animate="visible" className="mb-8">

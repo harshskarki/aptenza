@@ -67,7 +67,7 @@ export default function LoginPage() {
         variants={stagger}
         initial="hidden"
         animate="visible"
-        className="w-full max-w-md relative z-10"
+        className="w-full max-w-md relative z-10 px-2 sm:px-0"
       >
 
         {/* Logo */}

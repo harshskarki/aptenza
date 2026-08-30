@@ -121,7 +121,7 @@ function InterviewContent() {
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="w-full max-w-md text-center relative z-10"
+          className="w-full max-w-md text-center relative z-10 px-2 sm:px-0"
         >
           <div className="flex items-center justify-center gap-2 mb-8">
             <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-sm font-black text-white">A</div>

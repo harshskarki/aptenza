@@ -100,7 +100,7 @@ export default function PracticeQueuePage() {
         </div>
       </motion.nav>
 
-      <div className="max-w-2xl mx-auto px-6 py-10">
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
           <h2 className="text-3xl font-black mb-2">Practice Queue 📋</h2>
