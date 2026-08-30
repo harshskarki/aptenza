@@ -241,6 +241,20 @@ export default function ProfilePage() {
           )}
         </motion.div>
 
+        {/* Referral */}
+        <motion.div variants={fadeUp} initial="hidden" animate="visible"
+          className="bg-white dark:bg-gray-900 rounded-2xl p-6 border border-gray-200 dark:border-white/5 mb-6 transition-colors"
+        >
+          <h3 className="text-lg font-bold mb-1">Refer & Earn 🎁</h3>
+          <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">
+            Refer friends and get bonus interviews. You have <span className="text-indigo-500 font-bold">{profile?.referral_count || 0} referrals</span> so far.
+          </p>
+          <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} onClick={() => router.push('/referral')}
+            className="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2.5 rounded-xl text-sm font-bold transition">
+            View referral page →
+          </motion.button>
+        </motion.div>
+
         {/* Upgrade */}
         {profile?.plan === 'free' && (
           <motion.div variants={fadeUp} initial="hidden" animate="visible"

@@ -118,6 +118,8 @@ export default function DashboardPage() {
               <button onClick={() => router.push('/whiteboard')} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">⚙️ Whiteboard</button>
               <button onClick={() => router.push('/star')} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">🌟 STAR Builder</button>
               <div className="border-t border-gray-100 dark:border-white/5 my-1"></div>
+              <button onClick={() => router.push('/referral')} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">🎁 Refer & Earn</button>
+              <div className="border-t border-gray-100 dark:border-white/5 my-1"></div>
               <button onClick={() => router.push('/profile')} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">👤 Profile</button>
               <button onClick={handleLogout} className="w-full text-left text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 px-3 py-2 rounded-lg transition">🚪 Logout</button>
             </div>
