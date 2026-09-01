@@ -37,6 +37,42 @@ function InterviewContent() {
   }, [messages])
 
   async function startInterview() {
+    // Check plan gating
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    const { data: freshProfile } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single()
+
+    // Check interview type access
+    const typeAccess = {
+      dsa: ['free', 'pro', 'premium'],
+      behavioral: ['pro', 'premium'],
+      system_design: ['pro', 'premium'],
+      domain: ['premium']
+    }
+
+    if (!typeAccess[interviewType]?.includes(freshProfile.plan)) {
+      const required = interviewType === 'domain' ? 'Premium' : 'Pro'
+      alert(`This interview type requires the ${required} plan. Upgrade on the pricing page!`)
+      router.push('/pricing')
+      return
+    }
+
+    // Check interview limit
+    const limits = { free: 3, pro: 15, premium: Infinity }
+    const totalUsed = (freshProfile.interviews_used || 0)
+    const bonusInterviews = (freshProfile.bonus_interviews || 0)
+    const limit = limits[freshProfile.plan] + bonusInterviews
+
+    if (totalUsed >= limit) {
+      alert(`You've used all your interviews for this month. Upgrade your plan for more!`)
+      router.push('/pricing')
+      return
+    }
+
     setSessionStarted(true)
     setLoading(true)
     const response = await fetch('/api/interview', {

@@ -79,12 +79,19 @@ export default function DashboardPage() {
     )
   }
 
-  const interviewTypes = [
-    { type: 'dsa', icon: '💻', title: 'DSA Interview', desc: 'Data structures, algorithms, problem solving', badge: 'Free', badgeClass: 'bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-300' },
-    { type: 'behavioral', icon: '🧠', title: 'Behavioral Interview', desc: 'HR questions, situational, STAR method', badge: 'Pro', badgeClass: 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400' },
-    { type: 'system_design', icon: '⚙️', title: 'System Design', desc: 'Architecture, scalability, design patterns', badge: 'Pro', badgeClass: 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400' },
-    { type: 'domain', icon: '🎯', title: 'Domain Specific', desc: 'ML, Finance, Frontend, Backend and more', badge: 'Premium', badgeClass: 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400' },
-  ]
+  const planAccess = {
+  dsa: ['free', 'pro', 'premium'],
+  behavioral: ['pro', 'premium'],
+  system_design: ['pro', 'premium'],
+  domain: ['premium']
+}
+
+const interviewTypes = [
+  { type: 'dsa', icon: '💻', title: 'DSA Interview', desc: 'Data structures, algorithms, problem solving', badge: 'Free', badgeClass: 'bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-300' },
+  { type: 'behavioral', icon: '🧠', title: 'Behavioral Interview', desc: 'HR questions, situational, STAR method', badge: 'Pro', badgeClass: 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400' },
+  { type: 'system_design', icon: '⚙️', title: 'System Design', desc: 'Architecture, scalability, design patterns', badge: 'Pro', badgeClass: 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400' },
+  { type: 'domain', icon: '🎯', title: 'Domain Specific', desc: 'ML, Finance, Frontend, Backend and more', badge: 'Premium', badgeClass: 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400' },
+]
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white transition-colors duration-300">
@@ -233,23 +240,38 @@ export default function DashboardPage() {
         </motion.h3>
 
         <motion.div variants={stagger} initial="hidden" animate="visible" className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {interviewTypes.map((item, i) => (
-            <motion.div
-              key={i}
-              variants={fadeUp}
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => router.push(`/interview?type=${item.type}`)}
-              className="bg-white dark:bg-gray-900 rounded-xl p-6 border border-gray-200 dark:border-white/5 cursor-pointer hover:border-indigo-500 transition-colors"
-            >
-              <div className="text-2xl mb-3">{item.icon}</div>
-              <h4 className="font-bold">{item.title}</h4>
-              <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{item.desc}</p>
-              <span className={`inline-block mt-3 text-xs px-2 py-1 rounded-full ${item.badgeClass}`}>
-                {item.badge}
-              </span>
-            </motion.div>
-          ))}
+          {interviewTypes.map((item, i) => {
+            const hasAccess = planAccess[item.type]?.includes(profile?.plan)
+            return (
+              <motion.div
+                key={i}
+                variants={fadeUp}
+                whileHover={{ scale: hasAccess ? 1.03 : 1.01 }}
+                whileTap={{ scale: hasAccess ? 0.98 : 1 }}
+                onClick={() => hasAccess ? router.push(`/interview?type=${item.type}`) : router.push('/pricing')}
+                className={`bg-white dark:bg-gray-900 rounded-xl p-6 border transition-colors cursor-pointer relative ${
+                  hasAccess
+                    ? 'border-gray-200 dark:border-white/5 hover:border-indigo-500'
+                    : 'border-gray-200 dark:border-white/5 opacity-75'
+                }`}
+              >
+                {!hasAccess && (
+                  <div className="absolute top-3 right-3 text-gray-400 text-lg">🔒</div>
+                )}
+                <div className="text-2xl mb-3">{item.icon}</div>
+                <h4 className="font-bold">{item.title}</h4>
+                <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{item.desc}</p>
+                <div className="flex items-center justify-between mt-3">
+                  <span className={`text-xs px-2 py-1 rounded-full ${item.badgeClass}`}>
+                    {item.badge}
+                  </span>
+                  {!hasAccess && (
+                    <span className="text-xs text-indigo-500 hover:text-indigo-400">Upgrade →</span>
+                  )}
+                </div>
+              </motion.div>
+            )
+          })}
         </motion.div>
       </div>
     </main>
