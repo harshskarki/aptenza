@@ -61,16 +61,38 @@ function InterviewContent() {
       return
     }
 
-    // Check interview limit
-    const limits = { free: 3, pro: 15, premium: Infinity }
-    const totalUsed = (freshProfile.interviews_used || 0)
-    const bonusInterviews = (freshProfile.bonus_interviews || 0)
-    const limit = limits[freshProfile.plan] + bonusInterviews
+    // Check interview limitprevious tha
+    // const limits = { free: 3, pro: 15, premium: Infinity }
+    // const totalUsed = (freshProfile.interviews_used || 0)
+    // const bonusInterviews = (freshProfile.bonus_interviews || 0)
+    // const limit = limits[freshProfile.plan] + bonusInterviews
 
-    if (totalUsed >= limit) {
-      alert(`You've used all your interviews for this month. Upgrade your plan for more!`)
-      router.push('/pricing')
-      return
+    // if (totalUsed >= limit) {
+    //   alert(`You've used all your interviews for this month. Upgrade your plan for more!`)
+    //   router.push('/pricing')
+    //   return
+    // } 
+
+    
+    // Check interview limit (credits take priority)
+    const credits = freshProfile.interview_credits || 0
+    if (credits > 0) {
+      // Use a credit instead of plan allowance
+      await supabase
+        .from('profiles')
+        .update({ interview_credits: credits - 1 })
+        .eq('id', user.id)
+    } else {
+      const limits = { free: 3, pro: 15, premium: Infinity }
+      const totalUsed = (freshProfile.interviews_used || 0)
+      const bonusInterviews = (freshProfile.bonus_interviews || 0)
+      const limit = limits[freshProfile.plan] + bonusInterviews
+
+      if (totalUsed >= limit) {
+        alert(`You've used all your interviews for this month. Buy credits or upgrade your plan!`)
+        router.push('/credits')
+        return
+      }
     }
 
     setSessionStarted(true)
