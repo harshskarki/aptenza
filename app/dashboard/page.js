@@ -128,6 +128,7 @@ const interviewTypes = [
               <button onClick={() => router.push('/referral')} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">🎁 Refer & Earn</button>
               <button onClick={() => router.push('/promo')} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">🎟️ Promo Code</button>
               <button onClick={() => router.push('/credits')} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">💳 Buy Credits</button>
+              <button onClick={() => router.push('/invoice')} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">🧾 Invoices</button>
               <div className="border-t border-gray-100 dark:border-white/5 my-1"></div>
               <button onClick={() => router.push('/profile')} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">👤 Profile</button>
               <button onClick={handleLogout} className="w-full text-left text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 px-3 py-2 rounded-lg transition">🚪 Logout</button>
