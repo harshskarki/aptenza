@@ -23,6 +23,7 @@ export default function DashboardPage() {
   const [uploadMessage, setUploadMessage] = useState('')
   const fileInputRef = useRef(null)
   const router = useRouter()
+  const [showTools, setShowTools] = useState(false)
 
   useEffect(() => {
     async function loadProfile() {
@@ -112,27 +113,39 @@ const interviewTypes = [
           <button onClick={() => router.push('/leaderboard')} className="hidden sm:block text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition">Leaderboard</button>
 
           {/* Tools dropdown */}
-          <div className="relative group">
-            <button className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition flex items-center gap-1">
-              Tools ▾
+          <div className="relative">
+            <button
+              onClick={() => setShowTools(!showTools)}
+              className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition flex items-center gap-1"
+            >
+              Tools {showTools ? '▴' : '▾'}
             </button>
-            <div className="absolute right-0 top-8 bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 rounded-xl shadow-lg p-2 min-w-44 hidden group-hover:block z-50">
-              <button onClick={() => router.push('/analytics')} className="sm:hidden w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">📊 Analytics</button>
-              <button onClick={() => router.push('/leaderboard')} className="sm:hidden w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">🏆 Leaderboard</button>
-              <button onClick={() => router.push('/search')} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">🔍 Search</button>
-              <button onClick={() => router.push('/practice-queue')} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">📋 Practice Queue</button>
-              <button onClick={() => router.push('/code')} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">💻 Code Editor</button>
-              <button onClick={() => router.push('/whiteboard')} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">⚙️ Whiteboard</button>
-              <button onClick={() => router.push('/star')} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">🌟 STAR Builder</button>
-              <div className="border-t border-gray-100 dark:border-white/5 my-1"></div>
-              <button onClick={() => router.push('/referral')} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">🎁 Refer & Earn</button>
-              <button onClick={() => router.push('/promo')} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">🎟️ Promo Code</button>
-              <button onClick={() => router.push('/credits')} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">💳 Buy Credits</button>
-              <button onClick={() => router.push('/invoice')} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">🧾 Invoices</button>
-              <div className="border-t border-gray-100 dark:border-white/5 my-1"></div>
-              <button onClick={() => router.push('/profile')} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">👤 Profile</button>
-              <button onClick={handleLogout} className="w-full text-left text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 px-3 py-2 rounded-lg transition">🚪 Logout</button>
-            </div>
+            {showTools && (
+              <>
+                {/* Backdrop to close on outside click */}
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setShowTools(false)}
+                />
+                <div className="absolute right-0 top-8 bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 rounded-xl shadow-lg p-2 min-w-44 z-50">
+                  <button onClick={() => { router.push('/analytics'); setShowTools(false) }} className="sm:hidden w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">📊 Analytics</button>
+                  <button onClick={() => { router.push('/leaderboard'); setShowTools(false) }} className="sm:hidden w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">🏆 Leaderboard</button>
+                  <button onClick={() => { router.push('/search'); setShowTools(false) }} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">🔍 Search</button>
+                  <button onClick={() => { router.push('/practice-queue'); setShowTools(false) }} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">📋 Practice Queue</button>
+                  <button onClick={() => { router.push('/code'); setShowTools(false) }} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">💻 Code Editor</button>
+                  <button onClick={() => { router.push('/whiteboard'); setShowTools(false) }} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">⚙️ Whiteboard</button>
+                  <button onClick={() => { router.push('/star'); setShowTools(false) }} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">🌟 STAR Builder</button>
+                  <div className="border-t border-gray-100 dark:border-white/5 my-1"></div>
+                  <button onClick={() => { router.push('/referral'); setShowTools(false) }} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">🎁 Refer & Earn</button>
+                  <button onClick={() => { router.push('/promo'); setShowTools(false) }} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">🎟️ Promo Code</button>
+                  <button onClick={() => { router.push('/credits'); setShowTools(false) }} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">💳 Buy Credits</button>
+                  <button onClick={() => { router.push('/invoice'); setShowTools(false) }} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">🧾 Invoices</button>
+                  <div className="border-t border-gray-100 dark:border-white/5 my-1"></div>
+                  <button onClick={() => { router.push('/profile'); setShowTools(false) }} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">👤 Profile</button>
+                  <button onClick={() => { handleLogout(); setShowTools(false) }} className="w-full text-left text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 px-3 py-2 rounded-lg transition">🚪 Logout</button>
+                </div>
+              </>
+            )}
           </div>
 
           <ThemeToggle />
