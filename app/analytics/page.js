@@ -85,6 +85,9 @@ export default function AnalyticsPage() {
           >
             ← Back to dashboard
           </motion.button>
+          <button onClick={() => router.push('/deep-analytics')} className="text-sm text-indigo-500 hover:text-indigo-400 transition font-medium">
+            Deep Analytics →
+          </button>
         </div>
       </motion.nav>
 
