@@ -210,6 +210,9 @@ export default function DeepAnalyticsPage() {
           <button onClick={() => router.push('/analytics')} className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition">
             ← Analytics
           </button>
+          <button onClick={() => router.push('/study-guide')} className="text-sm text-indigo-500 hover:text-indigo-400 transition font-medium">
+            📚 Study Guide
+          </button>
         </div>
       </motion.nav>
 
