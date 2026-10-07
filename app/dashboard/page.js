@@ -142,6 +142,7 @@ const interviewTypes = [
                   <button onClick={() => { router.push('/invoice'); setShowTools(false) }} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">🧾 Invoices</button>
                   <button onClick={() => { router.push('/deep-analytics'); setShowTools(false) }} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">📊 Deep Analytics</button>
                   <button onClick={() => { router.push('/study-guide'); setShowTools(false) }} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">📚 Study Guide</button>
+                  <button onClick={() => { router.push('/streaks'); setShowTools(false) }} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">🔥 Streaks</button>
                   <div className="border-t border-gray-100 dark:border-white/5 my-1"></div>
                   <button onClick={() => { router.push('/profile'); setShowTools(false) }} className="w-full text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition">👤 Profile</button>
                   <button onClick={() => { handleLogout(); setShowTools(false) }} className="w-full text-left text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 px-3 py-2 rounded-lg transition">🚪 Logout</button>
@@ -183,6 +184,7 @@ const interviewTypes = [
             { label: 'Interviews done', value: profile?.interviews_used || 0 },
             { label: 'Current plan', value: profile?.plan || 'Free' },
             { label: 'Interviews left', value: profile?.plan === 'free' ? 3 - (profile?.interviews_used || 0) : '∞' },
+            { label: 'Current streak', value: `${profile?.current_streak || 0} 🔥` },
           ].map((stat, i) => (
             <motion.div
               key={i}
