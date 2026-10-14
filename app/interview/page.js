@@ -17,6 +17,11 @@ function InterviewContent() {
   const bottomRef = useRef(null)
   const router = useRouter()
   const searchParams = useSearchParams()
+  const [timeLimit, setTimeLimit] = useState(30) // minutes
+  const [timeLeft, setTimeLeft] = useState(null)
+  const [timerActive, setTimerActive] = useState(false)
+  const [pressureMode, setPressureMode] = useState(false)
+  const [timeWarning, setTimeWarning] = useState(false) 
 
   useEffect(() => {
     async function checkUser() {
@@ -36,76 +41,75 @@ function InterviewContent() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
-  async function startInterview() {
-    // Check plan gating
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    const { data: freshProfile } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', user.id)
-      .single()
-
-    // Check interview type access
-    const typeAccess = {
-      dsa: ['free', 'pro', 'premium'],
-      behavioral: ['pro', 'premium'],
-      system_design: ['pro', 'premium'],
-      domain: ['premium']
-    }
-
-    if (!typeAccess[interviewType]?.includes(freshProfile.plan)) {
-      const required = interviewType === 'domain' ? 'Premium' : 'Pro'
-      alert(`This interview type requires the ${required} plan. Upgrade on the pricing page!`)
-      router.push('/pricing')
+  useEffect(() => {
+    if (!timerActive || timeLeft === null) return
+    if (timeLeft <= 0) {
+      setTimerActive(false)
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: `⏰ Time's up! Your ${timeLimit}-minute interview session has ended.\n\nGreat job practicing under pressure! This is exactly what real interviews feel like. Review your answers and identify areas to improve.`
+      }])
       return
     }
+    if (timeLeft === 300) setTimeWarning(true) // 5 min warning
+    const timer = setTimeout(() => setTimeLeft(prev => prev - 1), 1000)
+    return () => clearTimeout(timer)
+  }, [timerActive, timeLeft])
 
-    // Check interview limitprevious tha
-    // const limits = { free: 3, pro: 15, premium: Infinity }
-    // const totalUsed = (freshProfile.interviews_used || 0)
-    // const bonusInterviews = (freshProfile.bonus_interviews || 0)
-    // const limit = limits[freshProfile.plan] + bonusInterviews
+  async function startInterview() {
+  // Check plan gating
+  const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  const { data: freshProfile } = await supabase
+    .from('profiles').select('*').eq('id', user.id).single()
 
-    // if (totalUsed >= limit) {
-    //   alert(`You've used all your interviews for this month. Upgrade your plan for more!`)
-    //   router.push('/pricing')
-    //   return
-    // } 
-
-    
-    // Check interview limit (credits take priority)
-    const credits = freshProfile.interview_credits || 0
-    if (credits > 0) {
-      // Use a credit instead of plan allowance
-      await supabase
-        .from('profiles')
-        .update({ interview_credits: credits - 1 })
-        .eq('id', user.id)
-    } else {
-      const limits = { free: 3, pro: 15, premium: Infinity }
-      const totalUsed = (freshProfile.interviews_used || 0)
-      const bonusInterviews = (freshProfile.bonus_interviews || 0)
-      const limit = limits[freshProfile.plan] + bonusInterviews
-
-      if (totalUsed >= limit) {
-        alert(`You've used all your interviews for this month. Buy credits or upgrade your plan!`)
-        router.push('/credits')
-        return
-      }
-    }
-
-    setSessionStarted(true)
-    setLoading(true)
-    const response = await fetch('/api/interview', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: [], interviewType, isStart: true })
-    })
-    const data = await response.json()
-    setMessages([{ role: 'assistant', content: data.message }])
-    setLoading(false)
+  const typeAccess = {
+    dsa: ['free', 'pro', 'premium'],
+    behavioral: ['pro', 'premium'],
+    system_design: ['pro', 'premium'],
+    domain: ['premium']
   }
+
+  if (!typeAccess[interviewType]?.includes(freshProfile.plan)) {
+    const required = interviewType === 'domain' ? 'Premium' : 'Pro'
+    alert(`This interview type requires the ${required} plan. Upgrade on the pricing page!`)
+    router.push('/pricing')
+    return
+  }
+
+  const credits = freshProfile.interview_credits || 0
+  if (credits > 0) {
+    await supabase.from('profiles').update({ interview_credits: credits - 1 }).eq('id', user.id)
+  } else {
+    const limits = { free: 3, pro: 15, premium: Infinity }
+    const totalUsed = freshProfile.interviews_used || 0
+    const bonusInterviews = freshProfile.bonus_interviews || 0
+    const limit = limits[freshProfile.plan] + bonusInterviews
+    if (totalUsed >= limit) {
+      alert(`You've used all your interviews for this month. Buy credits or upgrade your plan!`)
+      router.push('/credits')
+      return
+    }
+  }
+
+  setSessionStarted(true)
+  setLoading(true)
+
+  // Start timer if pressure mode
+  if (pressureMode) {
+    setTimeLeft(timeLimit * 60)
+    setTimerActive(true)
+  }
+
+  const response = await fetch('/api/interview', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ messages: [], interviewType, isStart: true })
+  })
+  const data = await response.json()
+  setMessages([{ role: 'assistant', content: data.message }])
+  setLoading(false)
+}
 
   async function saveSession(messages, lastResponse) {
     const supabase = createClient()
@@ -162,6 +166,12 @@ function InterviewContent() {
     }
   }
 
+  function formatTime(seconds) {
+    const m = Math.floor(seconds / 60).toString().padStart(2, '0')
+    const s = (seconds % 60).toString().padStart(2, '0')
+    return `${m}:${s}`
+  }
+
   const typeLabels = {
     dsa: '💻 DSA Interview',
     behavioral: '🧠 Behavioral Interview',
@@ -179,7 +189,7 @@ function InterviewContent() {
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="w-full max-w-md text-center relative z-10 px-2 sm:px-0"
+          className="w-full max-w-md text-center relative z-10"
         >
           <div className="flex items-center justify-center gap-2 mb-8">
             <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-sm font-black text-white">A</div>
@@ -199,7 +209,7 @@ function InterviewContent() {
             <select
               value={interviewType}
               onChange={(e) => setInterviewType(e.target.value)}
-              className="w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl px-4 py-3 border border-gray-200 dark:border-white/5 focus:outline-none focus:border-indigo-500 mb-6 transition"
+              className="w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl px-4 py-3 border border-gray-200 dark:border-white/5 focus:outline-none focus:border-indigo-500 mb-4 transition"
             >
               <option value="dsa">💻 DSA Interview</option>
               <option value="behavioral">🧠 Behavioral Interview</option>
@@ -207,13 +217,64 @@ function InterviewContent() {
               <option value="domain">🎯 Domain Specific</option>
             </select>
 
+            {/* Pressure mode toggle */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-white/5 mb-4">
+              <div className="flex items-center justify-between mb-3">
+                <div>
+                  <p className="font-bold text-sm">⏱️ Pressure Mode</p>
+                  <p className="text-xs text-gray-400 mt-0.5">Add a countdown timer to simulate real interviews</p>
+                </div>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setPressureMode(!pressureMode)}
+                  className={`relative w-12 h-6 rounded-full transition-colors ${pressureMode ? 'bg-indigo-600' : 'bg-gray-200 dark:bg-gray-700'}`}
+                >
+                  <motion.div
+                    animate={{ x: pressureMode ? 24 : 2 }}
+                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                    className="absolute top-1 w-4 h-4 rounded-full bg-white shadow"
+                  />
+                </motion.button>
+              </div>
+
+              {pressureMode && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  className="space-y-2"
+                >
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Time limit:</p>
+                  <div className="flex gap-2">
+                    {[15, 20, 30, 45].map(mins => (
+                      <button
+                        key={mins}
+                        onClick={() => setTimeLimit(mins)}
+                        className={`flex-1 py-2 rounded-xl text-xs font-bold transition ${
+                          timeLimit === mins
+                            ? 'bg-indigo-600 text-white'
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
+                        }`}
+                      >
+                        {mins}m
+                      </button>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </div>
+
             <motion.button
               whileHover={{ scale: 1.03, boxShadow: '0 0 20px rgba(99,102,241,0.3)' }}
               whileTap={{ scale: 0.97 }}
               onClick={startInterview}
-              className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3.5 rounded-xl transition text-base"
+              className={`w-full font-bold py-3.5 rounded-xl transition text-base text-white ${
+                pressureMode
+                  ? 'bg-orange-500 hover:bg-orange-400'
+                  : 'bg-indigo-600 hover:bg-indigo-500'
+              }`}
             >
-              Start Interview →
+              {pressureMode ? `⏱️ Start ${timeLimit}min Challenge →` : 'Start Interview →'}
             </motion.button>
 
             <button
@@ -234,16 +295,34 @@ function InterviewContent() {
       <motion.nav
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="border-b border-gray-200 dark:border-white/5 px-6 py-4 flex items-center justify-between bg-white dark:bg-gray-950 sticky top-0 z-10 transition-colors"
+        className="border-b border-gray-200 dark:border-white/5 px-4 sm:px-6 py-4 flex items-center justify-between bg-white dark:bg-gray-950 sticky top-0 z-10 transition-colors"
       >
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center text-xs font-black text-white">A</div>
           <span className="text-lg font-bold text-gray-900 dark:text-white">Aptenza</span>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-gray-500 dark:text-gray-400 text-sm">{typeLabels[interviewType]}</span>
+          <span className="text-gray-500 dark:text-gray-400 text-sm hidden sm:block">{typeLabels[interviewType]}</span>
           <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
           <span className="text-green-500 text-xs">Live</span>
+
+          {/* Timer display */}
+          {pressureMode && timeLeft !== null && (
+            <motion.div
+              animate={timeWarning ? { scale: [1, 1.05, 1] } : {}}
+              transition={{ repeat: Infinity, duration: 1 }}
+              className={`flex items-center gap-1.5 px-3 py-1 rounded-xl text-sm font-black ${
+                timeLeft <= 300
+                  ? 'bg-red-100 dark:bg-red-900/30 text-red-500'
+                  : timeLeft <= 600
+                  ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-500'
+                  : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300'
+              }`}
+            >
+              ⏱️ {formatTime(timeLeft)}
+            </motion.div>
+          )}
+
           <ThemeToggle />
         </div>
         <motion.button
@@ -256,7 +335,22 @@ function InterviewContent() {
         </motion.button>
       </motion.nav>
 
+      {/* Time warning */}
+      <AnimatePresence>
+        {timeWarning && timeLeft > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="bg-red-50 dark:bg-red-900/20 border-b border-red-200 dark:border-red-500/30 px-6 py-2 text-center"
+          >
+            <p className="text-red-500 text-sm font-bold">⚠️ 5 minutes remaining! Wrap up your answers.</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="flex-1 overflow-y-auto px-4 py-6 max-w-3xl mx-auto w-full">
+
         <AnimatePresence>
           {messages.map((msg, i) => (
             <motion.div
