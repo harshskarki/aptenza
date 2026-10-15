@@ -1,4 +1,10 @@
 import { aiResponseCache } from '@/utils/cache'
+import { rateLimit } from '@/utils/rateLimit'
+
+const limiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 20              // 20 requests per minute per user
+})
 
 // Question pools — each type has 5 questions
 const questionPools = {
@@ -126,6 +132,30 @@ function getUnaskedQuestionIndex(pool, previousMessages) {
 }
 
 export async function POST(request) {
+  // Get client IP for rate limiting
+  const ip = request.headers.get('x-forwarded-for') ||
+    request.headers.get('x-real-ip') ||
+    'anonymous'
+
+  const { success, remaining, resetInSeconds } = limiter(ip)
+
+  if (!success) {
+    return Response.json(
+      {
+        error: 'Too many requests',
+        message: `Rate limit exceeded. Try again in ${resetInSeconds} seconds.`,
+        resetInSeconds
+      },
+      {
+        status: 429,
+        headers: {
+          'X-RateLimit-Remaining': '0',
+          'Retry-After': resetInSeconds.toString()
+        }
+      }
+    )
+  }
+
   const { interviewType, isStart, messages } = await request.json()
   const pool = questionPools[interviewType] || questionPools.dsa
 

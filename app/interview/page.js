@@ -125,17 +125,16 @@ function InterviewContent() {
   }
 
   async function sendMessage() {
-    if (!input.trim() || loading) return
-    const userMessage = { role: 'user', content: input }
-    const updatedMessages = [...messages, userMessage]
-    setMessages(updatedMessages)
-    setInput('')
-    setLoading(true)
-    const response = await fetch('/api/interview', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: updatedMessages, interviewType, isStart: false })
-    })
+    if (response.status === 429) {
+      const data = await response.json()
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: `⚠️ You're sending messages too fast. Please wait ${data.resetInSeconds} seconds before continuing.`
+      }])
+      setLoading(false)
+      return
+    }
+
     const data = await response.json()
     const assistantMessage = { role: 'assistant', content: data.message }
     setMessages(prev => [...prev, assistantMessage])

@@ -1,4 +1,10 @@
 import Razorpay from 'razorpay'
+import { rateLimit } from '@/utils/rateLimit'
+
+const limiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 5 // only 5 payment attempts per minute
+})
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -11,6 +17,16 @@ const PLAN_PRICES = {
 }
 
 export async function POST(request) {
+  const ip = request.headers.get('x-forwarded-for') || 'anonymous'
+  const { success, resetInSeconds } = limiter(ip)
+
+  if (!success) {
+    return Response.json(
+      { error: `Too many requests. Try again in ${resetInSeconds} seconds.` },
+      { status: 429 }
+    )
+  }
+
   const { plan } = await request.json()
 
   if (!PLAN_PRICES[plan]) {
