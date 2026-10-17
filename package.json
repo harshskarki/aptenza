@@ -12,6 +12,7 @@
     "@anthropic-ai/sdk": "^0.101.0",
     "@excalidraw/excalidraw": "^0.18.1",
     "@monaco-editor/react": "^4.7.0",
+    "@sentry/nextjs": "^11.8.0",
     "@supabase/ssr": "^0.10.3",
     "@supabase/supabase-js": "^2.107.0",
     "framer-motion": "^12.40.0",
