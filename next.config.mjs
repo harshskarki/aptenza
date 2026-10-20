@@ -1,6 +1,15 @@
+import { withSentryConfig } from '@sentry/nextjs';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  /* config options here */
+  /* your existing config options here */
 };
 
-export default nextConfig;
+export default withSentryConfig(nextConfig, {
+  org: 'your-sentry-org', // Replace with your actual Sentry org slug
+  project: 'aptenza',
+  silent: !process.env.CI,
+  widenClientFileUpload: true,
+  hideSourceMaps: true,
+  disableLogger: true,
+});
