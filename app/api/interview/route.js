@@ -1,4 +1,3 @@
-import { aiResponseCache } from '@/utils/cache'
 import { rateLimit } from '@/utils/rateLimit'
 import * as Sentry from '@sentry/nextjs'
 
@@ -7,66 +6,6 @@ const limiter = rateLimit({
   max: 20
 })
 
-export async function POST(request) {
-  const ip = request.headers.get('x-forwarded-for') ||
-    request.headers.get('x-real-ip') ||
-    'anonymous'
-
-  const { success, remaining, resetInSeconds } = limiter(ip)
-
-  if (!success) {
-    return Response.json(
-      {
-        error: 'Too many requests',
-        message: `Rate limit exceeded. Try again in ${resetInSeconds} seconds.`,
-        resetInSeconds
-      },
-      { status: 429, headers: { 'X-RateLimit-Remaining': '0', 'Retry-After': resetInSeconds.toString() } }
-    )
-  }
-
-  try {
-    const { interviewType, isStart, messages } = await request.json()
-    const pool = questionPools[interviewType] || questionPools.dsa
-
-    const questionsAskedSoFar = (messages || []).filter(
-      m => m.role === 'assistant' && m.content.includes('**Question')
-    ).length
-
-    let responseMessage
-
-    if (isStart) {
-      const greetings = {
-        dsa: `Hi! I'm your AI interviewer for today's DSA session. Let's get started!\n\n`,
-        behavioral: `Hi! I'm your AI interviewer for today's Behavioral session. Let's get started!\n\n`,
-        system_design: `Hi! I'm your AI interviewer for today's System Design session. Let's get started!\n\n`,
-        domain: `Hi! I'm your AI interviewer for today's Domain Specific session. Let's get started!\n\n`
-      }
-      const idx = getUnaskedQuestionIndex(pool, [])
-      responseMessage = (greetings[interviewType] || greetings.dsa) + pool[idx].q
-    } else if (questionsAskedSoFar >= 5) {
-      responseMessage = getFinalFeedback(interviewType)
-    } else {
-      const lastAssistantMsg = [...messages].reverse().find(m => m.role === 'assistant')
-      const matchedQuestion = pool.find(item => lastAssistantMsg?.content.includes(item.q))
-      const feedbackText = matchedQuestion ? matchedQuestion.feedback : `✅ Good attempt — let's keep going.`
-      const idx = getUnaskedQuestionIndex(pool, messages)
-      const isLast = questionsAskedSoFar === 4
-      responseMessage = `${feedbackText}\n\n${isLast ? "Last question!" : "Ready for the next question?"}\n\n${pool[idx].q}`
-    }
-
-    return Response.json({ message: responseMessage, cached: false })
-
-  } catch (error) {
-    Sentry.captureException(error)
-    return Response.json(
-      { error: 'Internal server error', message: 'Something went wrong. Please try again.' },
-      { status: 500 }
-    )
-  }
-}
-
-// Question pools — each type has 5 questions
 const questionPools = {
   dsa: [
     {
@@ -161,38 +100,27 @@ const questionPools = {
 function getFinalFeedback(interviewType) {
   const scores = [6, 7, 7, 8]
   const score = scores[Math.floor(Math.random() * scores.length)]
-
   const finalFeedbacks = {
     dsa: `Great session! Here's your performance summary:\n\n**Overall Score: ${score}/10** 🎯\n\n**Strengths:**\n✅ Good problem understanding\n✅ Clear communication\n✅ Logical approach\n\n**Areas to improve:**\n⚠️ Work on optimizing time complexity\n⚠️ Practice edge case handling\n⚠️ Review common patterns (Hash Map, two pointers, sliding window)\n\nKeep practising — you're making great progress! 💪`,
     behavioral: `Great session! Here's your performance summary:\n\n**Overall Score: ${score}/10** 🎯\n\n**Strengths:**\n✅ Honest self-reflection\n✅ Good structure using STAR\n✅ Clear communication\n\n**Areas to improve:**\n⚠️ Add more measurable outcomes\n⚠️ Slow down and be more concise\n⚠️ Practice owning challenges without over-explaining\n\nKeep practising — you're making great progress! 💪`,
     system_design: `Great session! Here's your performance summary:\n\n**Overall Score: ${score}/10** 🎯\n\n**Strengths:**\n✅ Solid grasp of high-level architecture\n✅ Good awareness of scaling concerns\n✅ Logical breakdown of components\n\n**Areas to improve:**\n⚠️ Go deeper on database trade-offs\n⚠️ Discuss caching strategies explicitly\n⚠️ Consider failure scenarios and redundancy\n\nKeep practising — you're making great progress! 💪`,
     domain: `Great session! Here's your performance summary:\n\n**Overall Score: ${score}/10** 🎯\n\n**Strengths:**\n✅ Strong theoretical foundation\n✅ Clear explanations\n✅ Good awareness of trade-offs\n\n**Areas to improve:**\n⚠️ Add more real-world examples\n⚠️ Go deeper on implementation details\n⚠️ Discuss evaluation metrics more thoroughly\n\nKeep practising — you're making great progress! 💪`
   }
-
   return finalFeedbacks[interviewType] || finalFeedbacks.dsa
 }
 
-// Track which question indices have already been used in THIS conversation,
-// by reading them back out of the assistant messages already sent.
 function getUnaskedQuestionIndex(pool, previousMessages) {
   const askedTexts = previousMessages
     .filter(m => m.role === 'assistant')
     .map(m => m.content)
-
   const unaskedIndices = pool
     .map((_, idx) => idx)
     .filter(idx => !askedTexts.some(text => text.includes(pool[idx].q)))
-
-  if (unaskedIndices.length === 0) {
-    // fallback — shouldn't happen since we stop after 5 questions
-    return Math.floor(Math.random() * pool.length)
-  }
-
+  if (unaskedIndices.length === 0) return Math.floor(Math.random() * pool.length)
   return unaskedIndices[Math.floor(Math.random() * unaskedIndices.length)]
 }
 
 export async function POST(request) {
-  // Get client IP for rate limiting
   const ip = request.headers.get('x-forwarded-for') ||
     request.headers.get('x-real-ip') ||
     'anonymous'
@@ -201,60 +129,48 @@ export async function POST(request) {
 
   if (!success) {
     return Response.json(
-      {
-        error: 'Too many requests',
-        message: `Rate limit exceeded. Try again in ${resetInSeconds} seconds.`,
-        resetInSeconds
-      },
-      {
-        status: 429,
-        headers: {
-          'X-RateLimit-Remaining': '0',
-          'Retry-After': resetInSeconds.toString()
-        }
+      { error: 'Too many requests', message: `Rate limit exceeded. Try again in ${resetInSeconds} seconds.`, resetInSeconds },
+      { status: 429, headers: { 'X-RateLimit-Remaining': '0', 'Retry-After': resetInSeconds.toString() } }
+    )
+  }
+
+  try {
+    const { interviewType, isStart, messages } = await request.json()
+    const pool = questionPools[interviewType] || questionPools.dsa
+
+    const questionsAskedSoFar = (messages || []).filter(
+      m => m.role === 'assistant' && m.content.includes('**Question')
+    ).length
+
+    let responseMessage
+
+    if (isStart) {
+      const greetings = {
+        dsa: `Hi! I'm your AI interviewer for today's DSA session. Let's get started!\n\n`,
+        behavioral: `Hi! I'm your AI interviewer for today's Behavioral session. Let's get started!\n\n`,
+        system_design: `Hi! I'm your AI interviewer for today's System Design session. Let's get started!\n\n`,
+        domain: `Hi! I'm your AI interviewer for today's Domain Specific session. Let's get started!\n\n`
       }
-    )
-  }
-
-  const { interviewType, isStart, messages } = await request.json()
-  const pool = questionPools[interviewType] || questionPools.dsa
-
-  // Count how many questions have been asked so far (each assistant message with a "**Question" counts)
-  const questionsAskedSoFar = (messages || []).filter(
-    m => m.role === 'assistant' && m.content.includes('**Question')
-  ).length
-
-  let responseMessage
-
-  if (isStart) {
-    const greetings = {
-      dsa: `Hi! I'm your AI interviewer for today's DSA session. Let's get started!\n\n`,
-      behavioral: `Hi! I'm your AI interviewer for today's Behavioral session. Let's get started!\n\n`,
-      system_design: `Hi! I'm your AI interviewer for today's System Design session. Let's get started!\n\n`,
-      domain: `Hi! I'm your AI interviewer for today's Domain Specific session. Let's get started!\n\n`
+      const idx = getUnaskedQuestionIndex(pool, [])
+      responseMessage = (greetings[interviewType] || greetings.dsa) + pool[idx].q
+    } else if (questionsAskedSoFar >= 5) {
+      responseMessage = getFinalFeedback(interviewType)
+    } else {
+      const lastAssistantMsg = [...messages].reverse().find(m => m.role === 'assistant')
+      const matchedQuestion = pool.find(item => lastAssistantMsg?.content.includes(item.q))
+      const feedbackText = matchedQuestion ? matchedQuestion.feedback : `✅ Good attempt — let's keep going.`
+      const idx = getUnaskedQuestionIndex(pool, messages)
+      const isLast = questionsAskedSoFar === 4
+      responseMessage = `${feedbackText}\n\n${isLast ? "Last question!" : "Ready for the next question?"}\n\n${pool[idx].q}`
     }
-    const idx = getUnaskedQuestionIndex(pool, [])
-    responseMessage = (greetings[interviewType] || greetings.dsa) + pool[idx].q
-  } else if (questionsAskedSoFar >= 5) {
-    // Already asked all 5 — give final feedback
-    responseMessage = getFinalFeedback(interviewType)
-  } else {
-    // Give feedback on previous answer + ask next unasked question
-    const lastQuestionIdx = pool.findIndex(item =>
-      messages[messages.length - 2]?.content === undefined
-        ? false
-        : false
+
+    return Response.json({ message: responseMessage, cached: false })
+
+  } catch (error) {
+    Sentry.captureException(error)
+    return Response.json(
+      { error: 'Internal server error', message: 'Something went wrong. Please try again.' },
+      { status: 500 }
     )
-    // Find feedback matching the most recently asked question
-    const lastAssistantMsg = [...messages].reverse().find(m => m.role === 'assistant')
-    const matchedQuestion = pool.find(item => lastAssistantMsg?.content.includes(item.q))
-    const feedbackText = matchedQuestion ? matchedQuestion.feedback : `✅ Good attempt — let's keep going.`
-
-    const idx = getUnaskedQuestionIndex(pool, messages)
-    const isLast = questionsAskedSoFar === 4
-
-    responseMessage = `${feedbackText}\n\n${isLast ? "Last question!" : "Ready for the next question?"}\n\n${pool[idx].q}`
   }
-
-  return Response.json({ message: responseMessage, cached: false })
 }
