@@ -140,8 +140,10 @@ function InterviewContent() {
     setMessages(prev => [...prev, assistantMessage])
     setLoading(false)
     if (data.message.includes('Overall Score')) {
-      const { fireSchoolPride } = await import('@/utils/confetti')
-      fireSchoolPride()
+      try {
+        const { fireSchoolPride } = await import('@/utils/confetti')
+        fireSchoolPride()
+      } catch (e) {}
     }
     if (updatedMessages.length >= 6) {
       await saveSession(updatedMessages, data.message)
