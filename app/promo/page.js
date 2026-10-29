@@ -94,7 +94,9 @@ export default function PromoPage() {
 
       setMessage(`✅ Promo applied! You got ${bonus} bonus interviews added to your account.`)
       setSuccess(true)
-    } else if (promo.discount_type === 'plan_upgrade') {
+      const { fireConfetti } = await import('@/utils/confetti')
+      fireConfetti()
+      } else if (promo.discount_type === 'plan_upgrade') {
       await supabase
         .from('profiles')
         .update({
@@ -111,7 +113,9 @@ export default function PromoPage() {
 
       setMessage(`✅ Promo applied! Your plan has been upgraded to ${promo.discount_value.toUpperCase()}.`)
       setSuccess(true)
-    }
+      const { fireConfetti } = await import('@/utils/confetti')
+      fireConfetti()
+      }
 
     // Increment promo uses
     await supabase

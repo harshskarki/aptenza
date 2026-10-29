@@ -80,8 +80,10 @@ export default function PricingPage() {
           })
           const verifyData = await verifyRes.json()
           if (verifyData.success) {
-            router.push('/dashboard?upgraded=true')
-          } else {
+            const { fireConfetti } = await import('@/utils/confetti')
+            fireConfetti()
+            setTimeout(() => router.push('/dashboard?upgraded=true'), 1500)
+          }else {
             alert('Payment verification failed. Please contact support.')
           }
           setLoadingPlan(null)

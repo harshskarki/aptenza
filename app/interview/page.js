@@ -139,6 +139,10 @@ function InterviewContent() {
     const assistantMessage = { role: 'assistant', content: data.message }
     setMessages(prev => [...prev, assistantMessage])
     setLoading(false)
+    if (data.message.includes('Overall Score')) {
+      const { fireSchoolPride } = await import('@/utils/confetti')
+      fireSchoolPride()
+    }
     if (updatedMessages.length >= 6) {
       await saveSession(updatedMessages, data.message)
       const fromQueue = searchParams.get('fromQueue')

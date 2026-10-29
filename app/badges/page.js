@@ -189,7 +189,12 @@ export default function BadgesPage() {
                 transition={{ delay: i * 0.05 }}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => setSelectedBadge(badge)}
+                onClick={() => {
+                  setSelectedBadge(badge)
+                  if (isEarned(badge)) {
+                    import('@/utils/confetti').then(({ fireStars }) => fireStars())
+                  }
+                }}
                 className={`rounded-2xl p-4 border cursor-pointer text-center transition-all ${
                   earned
                     ? CATEGORY_COLORS[badge.category]
