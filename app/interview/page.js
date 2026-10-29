@@ -125,37 +125,56 @@ function InterviewContent() {
   }
 
   async function sendMessage() {
-    if (response.status === 429) {
-      const data = await response.json()
-      setMessages(prev => [...prev, {
-        role: 'assistant',
-        content: `⚠️ You're sending messages too fast. Please wait ${data.resetInSeconds} seconds before continuing.`
-      }])
-      setLoading(false)
-      return
-    }
+    if (!input.trim() || loading) return
+    const userMessage = { role: 'user', content: input }
+    const updatedMessages = [...messages, userMessage]
+    setMessages(updatedMessages)
+    setInput('')
+    setLoading(true)
 
-    const data = await response.json()
-    const assistantMessage = { role: 'assistant', content: data.message }
-    setMessages(prev => [...prev, assistantMessage])
-    setLoading(false)
-    if (data.message.includes('Overall Score')) {
-      try {
-        const { fireSchoolPride } = await import('@/utils/confetti')
-        fireSchoolPride()
-      } catch (e) {}
-    }
-    if (updatedMessages.length >= 6) {
-      await saveSession(updatedMessages, data.message)
-      const fromQueue = searchParams.get('fromQueue')
-      if (fromQueue) {
-        const saved = sessionStorage.getItem('practiceQueue')
-        const remaining = saved ? JSON.parse(saved) : []
-        setTimeout(() => {
-          if (remaining.length > 0) { router.push('/practice-queue') }
-          else { sessionStorage.removeItem('practiceQueue'); router.push('/dashboard') }
-        }, 3000)
+    try {
+      const response = await fetch('/api/interview', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: updatedMessages, interviewType, isStart: false })
+      })
+      const data = await response.json()
+
+      if (response.status === 429) {
+        setMessages(prev => [...prev, {
+          role: 'assistant',
+          content: `⚠️ You're sending messages too fast. Please wait ${data.resetInSeconds} seconds before continuing.`
+        }])
+        return
       }
+
+      const reply = data.message || 'Something went wrong. Please try again.'
+      setMessages(prev => [...prev, { role: 'assistant', content: reply }])
+
+      // Final feedback arrived: celebrate, save once, handle queue
+      if (reply.includes('Overall Score')) {
+        try {
+          const { fireSchoolPride } = await import('@/utils/confetti')
+          fireSchoolPride()
+        } catch (e) {}
+
+        await saveSession(updatedMessages, reply)
+
+        const fromQueue = searchParams.get('fromQueue')
+        if (fromQueue) {
+          const saved = sessionStorage.getItem('practiceQueue')
+          const remaining = saved ? JSON.parse(saved) : []
+          setTimeout(() => {
+            if (remaining.length > 0) router.push('/practice-queue')
+            else { sessionStorage.removeItem('practiceQueue'); router.push('/dashboard') }
+          }, 3000)
+        }
+      }
+    } catch (err) {
+      console.error('sendMessage error:', err)
+      setMessages(prev => [...prev, { role: 'assistant', content: '⚠️ Connection problem. Please try again.' }])
+    } finally {
+      setLoading(false)
     }
   }
 
