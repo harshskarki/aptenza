@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import { motion, AnimatePresence } from 'framer-motion'
 import ThemeToggle from '@/components/ThemeToggle'
+import { PageSkeleton } from '@/components/Skeleton'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -83,14 +84,7 @@ export default function BadgesPage() {
     ? ALL_BADGES
     : ALL_BADGES.filter(b => b.category === filter)
 
-  if (loading) {
-    return (
-      <main className="min-h-screen bg-white dark:bg-gray-950 flex items-center justify-center">
-        <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-          className="w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full" />
-      </main>
-    )
-  }
+  if (loading) return <PageSkeleton />
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white transition-colors duration-300">

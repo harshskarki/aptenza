@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import { motion, AnimatePresence } from 'framer-motion'
 import ThemeToggle from '@/components/ThemeToggle'
+import { MessageSkeleton } from '@/components/Skeleton'
 
 function InterviewContent() {
   const [messages, setMessages] = useState([])
@@ -401,17 +402,7 @@ function InterviewContent() {
           ))}
         </AnimatePresence>
 
-        {loading && (
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex justify-start mb-4">
-            <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center text-xs font-bold text-white mr-2 shrink-0">AI</div>
-            <div className="bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-white/5 rounded-2xl rounded-tl-none px-4 py-3 flex items-center gap-1.5">
-              {[0, 1, 2].map(i => (
-                <motion.div key={i} animate={{ y: [0, -6, 0] }} transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.15 }}
-                  className="w-1.5 h-1.5 bg-indigo-400 rounded-full" />
-              ))}
-            </div>
-          </motion.div>
-        )}
+        {loading && <MessageSkeleton />}
         <div ref={bottomRef} />
       </div>
 
